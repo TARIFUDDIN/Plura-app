@@ -1,39 +1,30 @@
-"use client";
-
-import React from "react";
-import { EyeOff } from "lucide-react";
-import { type FunnelPage } from "@prisma/client";
-
-import EditorRecursive from "./funnel-editor-components/recursive";
-
-
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useEditor } from "@/components/providers/editor/editor-provider";
+'use client'
+import { useEditor } from '@/components/providers/editor/editor-provider'
+import { Button } from '@/components/ui/button'
 import { getFunnelPageDetails } from '@/lib/queries'
-interface FunnelEditorProps {
-  funnelPageId: string;
-  liveMode?: boolean;
-  
-}
 
-const FunnelEditor: React.FC<FunnelEditorProps> = ({
-  funnelPageId,
-  liveMode,
-  
-}) => {
-  const { state, dispatch } = useEditor();
+import clsx from 'clsx'
+import { EyeOff } from 'lucide-react'
+import React, { useEffect } from 'react'
+import Recursive from './funnel-editor-components/recursive'
 
-  React.useEffect(() => {
+
+type Props = { funnelPageId: string; liveMode?: boolean }
+
+const FunnelEditor = ({ funnelPageId, liveMode }: Props) => {
+  const { dispatch, state } = useEditor()
+
+  useEffect(() => {
     if (liveMode) {
       dispatch({
-        type: "TOGGLE_LIVE_MODE",
+        type: 'TOGGLE_LIVE_MODE',
         payload: { value: true },
-      });
+      })
     }
-  }, [liveMode]);
+  }, [liveMode, dispatch])
 
-  React. useEffect(() => {
+  //CHALLENGE: make this more performant
+  useEffect(() => {
     const fetchData = async () => {
       const response = await getFunnelPageDetails(funnelPageId)
       if (!response) return
@@ -49,50 +40,50 @@ const FunnelEditor: React.FC<FunnelEditorProps> = ({
     fetchData()
   }, [funnelPageId, dispatch, liveMode])
 
-
-  const handleClickElement = () => {
+  const handleClick = () => {
     dispatch({
-      type: "CHANGE_CLICKED_ELEMENT",
+      type: 'CHANGE_CLICKED_ELEMENT',
       payload: {},
-    });
-  };
+    })
+  }
 
-  const handlePreview = () => {
-    dispatch({ type: "TOGGLE_LIVE_MODE" });
-    dispatch({ type: "TOGGLE_PREVIEW_MODE" });
-  };
-
+  const handleUnpreview = () => {
+    dispatch({ type: 'TOGGLE_PREVIEW_MODE' })
+    dispatch({ type: 'TOGGLE_LIVE_MODE' })
+  }
   return (
     <div
-      className={cn(
-        "h-screen overflow-y-hidden overflow-x-hidden mr-[385px] z-[999999] bg-background scrollbar scrollbar-thumb-muted-foreground/20 scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-medium",
+      className={clsx(
+        'use-automation-zoom-in h-full overflow-auto mr-[385px] bg-background transition-all rounded-md',
         {
-          "p-0 mr-0": state.editor.previewMode || state.editor.liveMode,
-          "!w-[850px] mx-auto": state.editor.device === "Tablet",
-          "!w-[420px] mx-auto": state.editor.device === "Mobile",
-          "pb-[100px] use-automation-zoom-in transition-all": !state.editor.previewMode && !state.editor.liveMode, // for scroll
+          '!p-0 !mr-0':
+            state.editor.previewMode === true || state.editor.liveMode === true,
+          '!w-[850px]': state.editor.device === 'Tablet',
+          '!w-[420px]': state.editor.device === 'Mobile',
+          'w-full': state.editor.device === 'Desktop',
         }
       )}
-      onClick={handleClickElement}
+      onClick={handleClick}
     >
       {state.editor.previewMode && state.editor.liveMode && (
         <Button
-          variant="outline"
-          size="icon"
-          className="absolute top-4 left-4 z-[100]"
-          onClick={handlePreview}
-          title="Back to editor"
+          variant={'ghost'}
+          size={'icon'}
+          className="w-6 h-6 bg-slate-600 p-[2px] fixed top-0 left-0 z-[100]"
+          onClick={handleUnpreview}
         >
-          <EyeOff aria-label="Back to editor" className="w-4 h-4" />
+          <EyeOff />
         </Button>
       )}
-
       {Array.isArray(state.editor.elements) &&
-        state.editor.elements.map((element) => (
-          <EditorRecursive key={element.id} element={element} />
+        state.editor.elements.map((childElement) => (
+          <Recursive
+            key={childElement.id}
+            element={childElement}
+          />
         ))}
     </div>
-  );
-};
+  )
+}
 
-export default FunnelEditor;
+export default FunnelEditor
