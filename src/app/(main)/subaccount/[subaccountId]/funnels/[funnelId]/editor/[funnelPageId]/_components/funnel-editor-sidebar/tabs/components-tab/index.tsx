@@ -13,6 +13,7 @@ import {
   import LinkPlaceholder from './link-placeholder'
   import ContactFormComponentPlaceholder from './contact-form-placeholder'
   import CheckoutPlaceholder from './checkout-placeholder'
+import ImagePlaceholder from './image-placeholder'
   
   type Props = {}
   
@@ -27,6 +28,12 @@ import {
         Component: <TextPlaceholder />,
         label: 'Text',
         id: 'text',
+        group: 'elements',
+      },
+      {
+        Component: <ImagePlaceholder />,
+        label: 'Image',
+        id: 'image',
         group: 'elements',
       },
       {

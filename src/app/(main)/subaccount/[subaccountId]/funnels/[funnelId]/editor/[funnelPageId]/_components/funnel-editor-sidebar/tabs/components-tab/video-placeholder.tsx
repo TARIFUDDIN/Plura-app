@@ -1,26 +1,21 @@
-import { EditorBtns } from '@/lib/constants'
-import { Youtube } from 'lucide-react'
-import React from 'react'
+import React from "react";
+import { Youtube } from "lucide-react";
 
-type Props = {}
+interface VideoPlaceholderProps {}
 
-const VideoPlaceholder = (props: Props) => {
-  const handleDragStart = (e: React.DragEvent, type: EditorBtns) => {
-    if (type === null) return
-    e.dataTransfer.setData('componentType', type)
-  }
+const VideoPlaceholder: React.FC<VideoPlaceholderProps> = ({}) => {
+  const handleDragStart = (event: React.DragEvent) => {
+    event.dataTransfer.setData("componentType", "video");
+  };
   return (
     <div
       draggable
-      onDragStart={(e) => handleDragStart(e, 'video')}
-      className="h-14 w-14 bg-muted rounded-lg flex items-center justify-center"
+      onDragStart={handleDragStart}
+      className="w-14 h-14 bg-muted rounded-md flex items-center justify-center cursor-grab"
     >
-      <Youtube
-        size={40}
-        className="text-muted-foreground"
-      />
+      <Youtube className="w-10 h-10 text-muted-foreground" />
     </div>
-  )
-}
+  );
+};
 
-export default VideoPlaceholder
+export default VideoPlaceholder;

@@ -1,29 +1,22 @@
-import { EditorBtns } from '@/lib/constants'
-import { TypeIcon } from 'lucide-react'
-import React from 'react'
+import React from "react";
+import { TypeIcon } from "lucide-react";
 
-type Props = {}
+interface TextPlaceholderProps {}
 
-const TextPlaceholder = (props: Props) => {
-  const handleDragState = (e: React.DragEvent, type: EditorBtns) => {
-    if (type === null) return
-    e.dataTransfer.setData('componentType', type)
-  }
+const TextPlaceholder: React.FC<TextPlaceholderProps> = (props) => {
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData("componentType", "text");
+  };
 
   return (
     <div
       draggable
-      onDragStart={(e) => {
-        handleDragState(e, 'text')
-      }}
-      className=" h-14 w-14 bg-muted rounded-lg flex items-center justify-center"
+      onDragStart={handleDragStart}
+      className="h-14 w-14 bg-muted rounded-md flex items-center justify-center cursor-grab"
     >
-      <TypeIcon
-        size={40}
-        className="text-muted-foreground"
-      />
+      <TypeIcon className="text-muted-foreground w-10 h-10" />
     </div>
-  )
-}
+  );
+};
 
-export default TextPlaceholder
+export default TextPlaceholder;

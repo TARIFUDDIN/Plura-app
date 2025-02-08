@@ -1,24 +1,22 @@
+import { Columns2 } from "lucide-react";
+import React from "react";
 
-import { EditorBtns } from '@/lib/constants'
-import React from 'react'
+interface TwoColumnsPlaceholderProps {}
 
-type Props = {}
+const TwoColumnsPlaceholder: React.FC<TwoColumnsPlaceholderProps> = ({}) => {
+  const handleDragState = (e: React.DragEvent) => {
+    e.dataTransfer.setData("componentType", '2Col');
+  };
 
-const TwoColumnsPlaceholder = (props: Props) => {
-  const handleDragStart = (e: React.DragEvent, type: EditorBtns) => {
-    if (type === null) return
-    e.dataTransfer.setData('componentType', type)
-  }
   return (
     <div
       draggable
-      onDragStart={(e) => handleDragStart(e, '2Col')}
-      className=" h-14 w-14 bg-muted/70 rounded-lg p-2 flex flex-row gap-[4px]"
+      onDragStart={handleDragState}
+      className="h-14 w-14 bg-muted/70 rounded-md p-2 flex flex-row gap-[4px] cursor-grab"
     >
-      <div className="border-dashed border-[1px] h-full rounded-sm bg-muted border-muted-foreground/50 w-full"></div>
-      <div className="border-dashed border-[1px] h-full rounded-sm bg-muted border-muted-foreground/50 w-full"></div>
+      <Columns2 className="w-10 h-10 text-muted-foreground"  />
     </div>
-  )
-}
+  );
+};
 
-export default TwoColumnsPlaceholder
+export default TwoColumnsPlaceholder;

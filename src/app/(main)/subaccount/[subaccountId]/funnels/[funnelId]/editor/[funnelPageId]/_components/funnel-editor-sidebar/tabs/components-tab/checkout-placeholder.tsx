@@ -1,30 +1,28 @@
-import { EditorBtns } from '@/lib/constants'
-import { Youtube } from 'lucide-react'
-import Image from 'next/image'
-import React from 'react'
+import Image from "next/image";
+import React from "react";
 
-type Props = {}
+interface PaymentFormPlaceholderProps {}
 
-const CheckoutPlaceholder = (props: Props) => {
-  const handleDragStart = (e: React.DragEvent, type: EditorBtns) => {
-    if (type === null) return
-    e.dataTransfer.setData('componentType', type)
-  }
+const PaymentFormPlaceholder: React.FC<PaymentFormPlaceholderProps> = ({}) => {
+  const handleDragStart = (event: React.DragEvent) => {
+    event.dataTransfer.setData("componentType", "paymentForm");
+  };
+
   return (
     <div
       draggable
-      onDragStart={(e) => handleDragStart(e, 'paymentForm')}
-      className=" h-14 w-14 bg-muted rounded-lg flex items-center justify-center"
+      onDragStart={handleDragStart}
+      className="w-14 h-14 bg-muted rounded-lg flex items-center justify-center cursor-grab"
     >
       <Image
         src="/stripelogo.png"
-        height={40}
         width={40}
-        alt="stripe logo"
+        height={40}
+        alt="Stripe Logo"
         className="object-cover"
       />
     </div>
-  )
-}
+  );
+};
 
-export default CheckoutPlaceholder
+export default PaymentFormPlaceholder;

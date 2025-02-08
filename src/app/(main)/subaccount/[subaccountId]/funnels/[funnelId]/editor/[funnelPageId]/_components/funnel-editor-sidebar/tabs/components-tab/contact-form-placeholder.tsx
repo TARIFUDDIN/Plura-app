@@ -1,26 +1,22 @@
-import { EditorBtns } from '@/lib/constants'
-import { Contact2Icon, TypeIcon } from 'lucide-react'
-import React from 'react'
+import React from "react";
+import { Contact2 } from "lucide-react";
 
-type Props = {}
+interface ContactFormPlaceholderProps {}
 
-const ContactFormComponentPlaceholder = (props: Props) => {
-  const handleDragStart = (e: React.DragEvent, type: EditorBtns) => {
-    if (type === null) return
-    e.dataTransfer.setData('componentType', type)
-  }
+const ContactFormPlaceholder: React.FC<ContactFormPlaceholderProps> = ({}) => {
+  const handleDragStart = (event: React.DragEvent) => {
+    event.dataTransfer.setData("componentType", "contactForm");
+  };
+
   return (
     <div
       draggable
-      onDragStart={(e) => handleDragStart(e, 'contactForm')}
-      className=" h-14 w-14 bg-muted rounded-lg flex items-center justify-center"
+      onDragStart={handleDragStart}
+      className="h-14 w-14 bg-muted/70 rounded-md p-2 flex items-center justify-center cursor-grab"
     >
-      <Contact2Icon
-        size={40}
-        className="text-muted-foreground"
-      />
+      <Contact2 className="w-10 h-10 text-muted-foreground" />
     </div>
-  )
-}
+  );
+};
 
-export default ContactFormComponentPlaceholder
+export default ContactFormPlaceholder;
