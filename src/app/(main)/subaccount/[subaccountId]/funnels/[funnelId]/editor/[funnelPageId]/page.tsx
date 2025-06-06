@@ -16,41 +16,44 @@ type Props = {
 }
 
 const Page = async ({ params }: Props) => {
+  // Make sure params is fully resolved before using its properties
+  const { subaccountId, funnelId, funnelPageId } = params;
+  
   const funnelPageDetails = await db.funnelPage.findFirst({
     where: {
-      id: params.funnelPageId,
+      id: funnelPageId,
     },
   })
+
   if (!funnelPageDetails) {
     return redirect(
-      `/subaccount/${params.subaccountId}/funnels/${params.funnelId}`
+      `/subaccount/${subaccountId}/funnels/${funnelId}`
     )
   }
 
   return (
     <div className="fixed top-0 bottom-0 left-0 right-0 z-[20] bg-background overflow-hidden">
       <EditorProvider
-        subaccountId={params.subaccountId}
-        funnelId={params.funnelId}
+        subaccountId={subaccountId}
+        funnelId={funnelId}
         pageDetails={funnelPageDetails}
       >
         <FunnelEditorNavigation
-          funnelId={params.funnelId}
+          funnelId={funnelId}
           funnelPageDetails={funnelPageDetails}
-          subaccountId={params.subaccountId}
+          subaccountId={subaccountId}
         />
-        <div  className="h-full flex justify-center" >
-          <FunnelEditor
-        funnelPageId={params.subaccountId}/>
-
+        <div className="h-full flex justify-center">
+          <FunnelEditor funnelPageId={funnelPageId} />
         </div>
-      <FunnelEditorSidebar subaccountId={params.subaccountId} />
+        <FunnelEditorSidebar subaccountId={subaccountId} />
       </EditorProvider>
     </div>
   )
 }
 
 export default Page
+
 export const metadata = constructMetadata({
   title: "Editor - Plura",
 });

@@ -1,8 +1,7 @@
 "use client";
-
 import React from "react";
 import { cn } from "@/lib/utils";
-import { TESTIMONIALS_CARD, TestimonialsItem } from "@/config/testimonials";
+import { TESTIMONIALS_CARD } from "@/config/testimonials";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface InfiniteMovingCardsProps {
@@ -28,67 +27,75 @@ export const InfiniteMovingCards: React.FC<InfiniteMovingCardsProps> = ({
 
   function addAnimation() {
     if (containerRef.current && scrollerRef.current) {
-      const scrollerContent = Array.from(scrollerRef.current.children);
-
-      scrollerContent.forEach((item) => {
+      // First, clear any existing duplicates
+      const originalChildren = Array.from(
+        scrollerRef.current.children
+      ).slice(0, TESTIMONIALS_CARD.length);
+      
+      scrollerRef.current.innerHTML = "";
+      
+      // Add original elements back
+      originalChildren.forEach(child => {
+        scrollerRef.current?.appendChild(child);
+      });
+      
+      // Then duplicate them
+      originalChildren.forEach(item => {
         const duplicatedItem = item.cloneNode(true);
         if (scrollerRef.current) {
           scrollerRef.current.appendChild(duplicatedItem);
         }
       });
-
-      getDirection();
-      getSpeed();
+      
       setStart(true);
     }
   }
-  const getDirection = () => {
-    if (containerRef.current) {
-      if (direction === "left") {
-        containerRef.current.style.setProperty(
-          "--animation-direction",
-          "forwards"
-        );
-      } else {
-        containerRef.current.style.setProperty(
-          "--animation-direction",
-          "reverse"
-        );
-      }
-    }
-  };
-  const getSpeed = () => {
-    if (containerRef.current) {
-      if (speed === "fast") {
-        containerRef.current.style.setProperty("--animation-duration", "20s");
-      } else if (speed === "normal") {
-        containerRef.current.style.setProperty("--animation-duration", "40s");
-      } else {
-        containerRef.current.style.setProperty("--animation-duration", "80s");
-      }
-    }
-  };
 
   return (
     <div
       ref={containerRef}
       className={cn(
-        "scroller relative z-20 overflow-hidden  [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]",
+        "scroller relative z-20 overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]",
         className
       )}
     >
+      <style jsx>{`
+        @keyframes scroll {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(-50%);
+          }
+        }
+        
+        .scrolling-wrapper {
+          display: flex;
+          min-width: 100%;
+          width: max-content;
+          flex-wrap: nowrap;
+          gap: 1rem;
+          padding: 1rem 0;
+        }
+        
+        .scrolling-wrapper.animate {
+          animation: scroll ${speed === "fast" ? "20s" : speed === "normal" ? "40s" : "80s"} 
+                    linear ${direction === "left" ? "normal" : "reverse"} infinite;
+        }
+        
+        .scrolling-wrapper.animate:hover {
+          animation-play-state: ${pauseOnHover ? "paused" : "running"};
+        }
+      `}</style>
+      
       <div
         ref={scrollerRef}
-        className={cn(
-          " flex min-w-full shrink-0 gap-4 py-4 w-max flex-nowrap",
-          start && "animate-scroll ",
-          pauseOnHover && "hover:[animation-play-state:paused]"
-        )}
+        className={`scrolling-wrapper ${start ? "animate" : ""}`}
       >
         {TESTIMONIALS_CARD.map((item, idx) => (
           <Card
             className="w-[350px] max-w-full pt-6 relative rounded-2xl border border-b-0 flex-shrink-0 md:w-[450px]"
-            key={item.name}
+            key={`${item.name}-${idx}`}
           >
             <CardContent>
               <div
@@ -100,10 +107,10 @@ export const InfiniteMovingCards: React.FC<InfiniteMovingCardsProps> = ({
               </span>
               <div className="relative z-20 mt-6 flex flex-row items-center">
                 <span className="flex flex-col gap-1">
-                  <span className=" text-sm leading-[1.6] font-normal text-muted-foreground">
+                  <span className="text-sm leading-[1.6] font-normal text-muted-foreground">
                     {item.name}
                   </span>
-                  <span className=" text-sm leading-[1.6] font-normal text-muted-foreground">
+                  <span className="text-sm leading-[1.6] font-normal text-muted-foreground">
                     {item.title}
                   </span>
                 </span>

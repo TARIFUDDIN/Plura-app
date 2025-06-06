@@ -45,7 +45,7 @@
     "@stripe/stripe-js": "^5.5.0",
     "@swc/core": "^1.7.42",
     "@tanstack/react-table": "^8.20.6",
-    "@tremor/react": "^3.18.3",
+    "@tremor/react": "^3.18.7",
     "@types/react-beautiful-dnd": "^13.1.8",
     "@types/uuid": "^10.0.0",
     "@uploadthing/react": "^7.1.0",

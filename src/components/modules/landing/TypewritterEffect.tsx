@@ -30,7 +30,7 @@ export const TypewriterEffect: React.FC<TypewriterEffectProps> = ({
   }));
 
   const renderWords = () => (
-    <p>
+    <div>
       {wordsArray.map((word, wordIdx) => (
         <span key={`word-${wordIdx}`} className="inline-block">
           {word.text.map((char, charIdx) => (
@@ -41,7 +41,7 @@ export const TypewriterEffect: React.FC<TypewriterEffectProps> = ({
           &nbsp;
         </span>
       ))}
-    </p>
+    </div>
   );
 
   return (

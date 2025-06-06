@@ -569,16 +569,22 @@ export const createMedia = async (
   subaccountId: string,
   mediaFile: CreateMediaType
 ) => {
-  const response = await db.media.create({
-    data: {
+  const response = await db.media.upsert({
+    where: { link: mediaFile.link },
+    update: {
+      name: mediaFile.name,
+      subAccountId: subaccountId,
+    },
+    create: {
       link: mediaFile.link,
       name: mediaFile.name,
       subAccountId: subaccountId,
     },
-  })
+  });
 
-  return response
-}
+  return response;
+};
+
 export const deleteMedia = async (mediaId: string) => {
   const response = await db.media.delete({
     where: {
@@ -987,5 +993,26 @@ export const getFunnelPageDetails = async (funnelPageId: string) => {
     },
   })
 
+  return response
+}
+export const getDomainContent = async (subDomainName: string) => {
+  const response = await db.funnel.findUnique({
+    where: {
+      subDomainName,
+    },
+    include: { FunnelPages: true },
+  })
+  return response
+}
+
+export const getPipelines = async (subaccountId: string) => {
+  const response = await db.pipeline.findMany({
+    where: { subAccountId: subaccountId },
+    include: {
+      Lane: {
+        include: { Tickets: true },
+      },
+    },
+  })
   return response
 }

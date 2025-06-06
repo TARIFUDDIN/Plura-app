@@ -10,6 +10,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 
 const HomePage: React.FC = () => {
+  
   return (
     <div className="h-full">
       <section className="w-full relative">

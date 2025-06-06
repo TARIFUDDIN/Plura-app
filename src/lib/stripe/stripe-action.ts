@@ -48,19 +48,14 @@ export const subscriptionCreate = async (
 }
 
 export const getConnectAccountProducts = async (stripeAccount: string) => {
-  try {
-    const products = await stripe.products.list(
-      {
-        limit: 50,
-        expand: ["data.default_price"],
-      },
-      {
-        stripeAccount,
-      }
-    );
-    return products.data;
-  } catch (error) {
-    console.error('Error fetching products:', error);
-    throw error;
-  }
-};
+  const products = await stripe.products.list(
+    {
+      limit: 50,
+      expand: ['data.default_price'],
+    },
+    {
+      stripeAccount,
+    }
+  )
+  return products.data
+}

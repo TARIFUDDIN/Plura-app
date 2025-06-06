@@ -68,18 +68,16 @@ const EditorPayment: React.FC<EditorPaymentProps> = ({ element }) => {
     fetchFunnel();
   }, [funnelId]);
 
-  React.useEffect(() => {
-    if (!livePrices.length || !subaccountId || !subAccountConnectedId)
-      return undefined;
-
-    const getClientSecret = async () => {
-      try {
-        const payload = JSON.stringify({
-          subAccountConnectedId,
-          prices: livePrices,
-          subaccountId,
-        });
-
+  React.useEffect(()=>{
+    if(!livePrices.length || !subaccountId || !subAccountConnectedId)
+      return undefined
+    const getClientSecret=async()=>{
+      try{
+        const payload=JSON.stringify({
+subAccountConnectedId,
+prices:livePrices,
+subaccountId,
+        })
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_URL}api/stripe/create-checkout-session`,
           {
@@ -90,7 +88,6 @@ const EditorPayment: React.FC<EditorPaymentProps> = ({ element }) => {
             body: payload,
           }
         );
-
         const data = await response.json();
 
         if (!data) throw new Error("Something went wrong...");
@@ -108,7 +105,6 @@ const EditorPayment: React.FC<EditorPaymentProps> = ({ element }) => {
 
     getClientSecret();
   }, [livePrices, subaccountId, subAccountConnectedId]);
-
   const handleOnClickBody = (event: React.MouseEvent) => {
     event.stopPropagation();
 

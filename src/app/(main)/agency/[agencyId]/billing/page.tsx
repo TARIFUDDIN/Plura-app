@@ -19,36 +19,44 @@ type Props = {
   params: { agencyId: string }
 }
 
-const page = async ({ params }: Props) => {
-  //CHALLENGE : Create the add on  products
-  const addOns = await stripe.products.list({
-    ids: addOnProducts.map((product) => product.id),
-    expand: ['data.default_price'],
-  })
-
+const Page = async ({ params }: Props) => {
+  // Make sure params.agencyId is properly awaited or validated
+  const agencyId = params.agencyId;
+  
+  // First, fetch the agency subscription
   const agencySubscription = await db.agency.findUnique({
     where: {
-      id: params.agencyId,
+      id: agencyId,
     },
     select: {
       customerId: true,
       Subscription: true,
     },
-  })
+  });
 
+  // Then get the add-on products
+  const addOns = await stripe.products.list({
+    ids: addOnProducts.map((product) => product.id),
+    expand: ['data.default_price'],
+  });
+
+  // Fetch pricing data
   const prices = await stripe.prices.list({
     product: process.env.NEXT_PLURA_PRODUCT_ID,
     active: true,
-  })
+  });
 
   const currentPlanDetails = pricingCards.find(
     (c) => c.priceId === agencySubscription?.Subscription?.priceId
-  )
+  );
 
-  const charges = await stripe.charges.list({
-    limit: 50,
-    customer: agencySubscription?.customerId,
-  })
+  // Only fetch charges if we have a customerId
+  const charges = agencySubscription?.customerId 
+    ? await stripe.charges.list({
+        limit: 50,
+        customer: agencySubscription.customerId,
+      })
+    : { data: [] };
 
   const allCharges = [
     ...charges.data.map((charge) => ({
@@ -60,7 +68,7 @@ const page = async ({ params }: Props) => {
       status: 'Paid',
       amount: `$${charge.amount / 100}`,
     })),
-  ]
+  ];
 
   return (
     <>
@@ -173,4 +181,4 @@ const page = async ({ params }: Props) => {
   )
 }
 
-export default page
+export default Page

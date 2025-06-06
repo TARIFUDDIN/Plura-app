@@ -1,39 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SaaS Website Builder, Project Management And Dashboard With Stripe using Nextjs14, Bun, Stripe Connect, Prisma, MySQL, Tailwind
 
-## Getting Started
+![Application Logo](image.png)
 
-First, run the development server:
+### Features in this application.
+- 🤯 Multivendor B2B2B Saas
+- 🏢 Agency and Sub accounts
+- 🌐 Unlimited funnel hosting
+- 🚀 Full Website & Funnel builder
+- 💻 Role-based Access
+- 🔄 Stripe Subscription plans
+- 🛒 Stripe add-on products
+- 🔐 Connect Stripe accounts for all users! - Stripe Connect
+- 💳 Charge application fee per sale and recurring sales
+- 💰 Custom Dashboards
+- 📊 Media Storage
+- 📈 Stripe Product Sync
+- 📌Custom checkouts on funnels
+- 📢 Get leads from funnels
+- 🎨 Kanban board
+- 📂 Project management system
+- 🔗 Notifications
+- 📆 Funnel performance metrics
+- 🧾 Agency and subaccount metrics
+- 🌙 Graphs and charts
+- ☀️ Light & Dark mode
+- 📄 Functioning landing page
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Website builer
+A simple website builder that allows you to create content on the page. Simply drag and drop the chosen element (such as a container, text, or even a payment form) onto the editor page.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+![image](website.png)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+The editor has full accessibility; for example, to undo your last actions, click the Undo button or press the Ctrl + Z key combination.
 
-To learn more about Next.js, take a look at the following resources:
+To preview the site in Preview mode, press the Ctrl + P key combination
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+To style the selected element, choose the section in the Settings tab and modify the styles as desired. Hotkeys are also available, for example, Ctrl + B to make text bold or Ctrl + I to italicize font style.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+![image](website2.png)
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+You can see the layers of your entire page. To do that just navigate to the Layers tab where you can see your layers structure in a tree-like representation.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-"# Plura-Saas" 
-"# Plura-Saas" 
-"# Plura-app" 
+<p align="center">
+  <img src="layers.png" title="hover text">
+</p>
+
+You can also upload media files (such as images) to the Media storage to use them in the Website Builder. To do this, navigate to the Media tab and select the file you want to upload.
+
+<p align="center">
+  <img src="upload.png" title="hover text">
+</p>
+
+## Kanban Board
+You can create new lanes and new tickets within them. It's possible to drag cards and lanes to change their order. You can create new tags and assign other users who have access to your team to specific tickets, as well as leave a contact link.
+
+![image](kanban.png)
+
+
+![image](kanban.png)
+
+## Team Access
+If you've created an agency, you can create sub-accounts for that agency.
+
+![image](team-access.png)
+
+To grant access to another user for a sub-account of the agency, you can send them an invitation via email. 
+
+![image](invitation.png)
+
+If the user accepts the invitation to the agency, you can control their access to different sub-accounts.
+
+<p align="center">
+  <img src="permission.png)" title="hover text">
+</p>
