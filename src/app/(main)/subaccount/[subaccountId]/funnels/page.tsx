@@ -10,13 +10,16 @@ import { columns } from "./columns";
 import { constructMetadata } from "@/lib/utils";
 
 interface FunnelsPageProps {
-  params: {
+  params: Promise<{
     subaccountId: string;
-  };
+  }>;
 }
 
-const FunnelsPageProps: React.FC<FunnelsPageProps> = async ({ params }) => {
-  const funnels = await getFunnels(params.subaccountId);
+const FunnelsPage: React.FC<FunnelsPageProps> = async ({ params }) => {
+  // Await params before using its properties
+  const { subaccountId } = await params;
+  
+  const funnels = await getFunnels(subaccountId);
 
   if (!funnels) return null;
 
@@ -29,7 +32,7 @@ const FunnelsPageProps: React.FC<FunnelsPageProps> = async ({ params }) => {
             Create Funnel
           </>
         }
-        modalChildren={<FunnelForm subAccountId={params.subaccountId} />}
+        modalChildren={<FunnelForm subAccountId={subaccountId} />}
         filterValue="name"
         columns={columns}
         data={funnels}
@@ -38,7 +41,7 @@ const FunnelsPageProps: React.FC<FunnelsPageProps> = async ({ params }) => {
   );
 };
 
-export default FunnelsPageProps;
+export default FunnelsPage;
 
 export const metadata = constructMetadata({
   title: "Funnels - Plura",

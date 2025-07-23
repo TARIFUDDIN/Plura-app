@@ -1,7 +1,7 @@
 'use client'
 import { EditorBtns } from '@/lib/constants'
 import { EditorAction } from './editor-actions'
-import { Dispatch, createContext, useContext, useReducer } from 'react'
+import { Dispatch, createContext, useContext, useReducer, useEffect, useState } from 'react'
 import { FunnelPage } from '@prisma/client'
 
 export type DeviceTypes = 'Desktop' | 'Mobile' | 'Tablet'
@@ -380,6 +380,15 @@ type EditorProps = {
 
 const EditorProvider = (props: EditorProps) => {
   const [state, dispatch] = useReducer(editorReducer, initialState)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return <div className="w-full h-full bg-background" />
+  }
 
   return (
     <EditorContext.Provider

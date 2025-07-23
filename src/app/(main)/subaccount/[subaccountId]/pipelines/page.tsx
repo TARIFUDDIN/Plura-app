@@ -4,11 +4,12 @@ import { redirect } from 'next/navigation'
 import React from 'react'
 
 type Props = {
-  params: { subaccountId: string }
+  params: Promise<{ subaccountId: string }>
 }
 
 const Pipelines = async ({ params }: Props) => {
-  const { subaccountId } = params;
+  // Await params before using its properties
+  const { subaccountId } = await params;
 
   if (!subaccountId) redirect("/subaccount/unauthorized");
 

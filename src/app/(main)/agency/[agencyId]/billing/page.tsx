@@ -16,12 +16,12 @@ import clsx from 'clsx'
 import SubscriptionHelper from './_components/subscription-helper'
 
 type Props = {
-  params: { agencyId: string }
+  params: Promise<{ agencyId: string }>
 }
 
 const Page = async ({ params }: Props) => {
-  // Make sure params.agencyId is properly awaited or validated
-  const agencyId = params.agencyId;
+  // Await params before using agencyId
+  const { agencyId } = await params
   
   // First, fetch the agency subscription
   const agencySubscription = await db.agency.findUnique({

@@ -1,4 +1,3 @@
-
 import Unauthorized from '@/components/common/Unauthorized'
 import AgencyDetails from '@/components/forms/AgencyDetails'
 import { getAuthUserDetails, verifyAndAcceptInvitation } from '@/lib/queries'
@@ -10,30 +9,32 @@ import React from 'react'
 const Page = async ({
   searchParams,
 }: {
-  searchParams: { plan: Plan; state: string; code: string }
+  searchParams: Promise<{ plan: Plan; state: string; code: string }>
 }) => {
+  // Await searchParams before using its properties
+  const resolvedSearchParams = await searchParams
+  
   const agencyId = await verifyAndAcceptInvitation()
   console.log(agencyId)
-
   
   const user = await getAuthUserDetails()
   if (agencyId) {
     if (user?.role === 'SUBACCOUNT_GUEST' || user?.role === 'SUBACCOUNT_USER') {
       return redirect('/subaccount')
     } else if (user?.role === 'AGENCY_OWNER' || user?.role === 'AGENCY_ADMIN') {
-      if (searchParams.plan) {
-        return redirect(`/agency/${agencyId}/billing?plan=${searchParams.plan}`)
+      if (resolvedSearchParams.plan) {
+        return redirect(`/agency/${agencyId}/billing?plan=${resolvedSearchParams.plan}`)
       }
-      if (searchParams.state) {
-        const statePath = searchParams.state.split('___')[0]
-        const stateAgencyId = searchParams.state.split('___')[1]
+      if (resolvedSearchParams.state) {
+        const statePath = resolvedSearchParams.state.split('___')[0]
+        const stateAgencyId = resolvedSearchParams.state.split('___')[1]
         if (!stateAgencyId) return <div>Not authorized</div>
         return redirect(
-          `/agency/${stateAgencyId}/${statePath}?code=${searchParams.code}`
+          `/agency/${stateAgencyId}/${statePath}?code=${resolvedSearchParams.code}`
         )
       } else return redirect(`/agency/${agencyId}`)
     } else {
-      return <Unauthorized/>;
+      return <Unauthorized/>
     }
   }
   const authUser = await currentUser()

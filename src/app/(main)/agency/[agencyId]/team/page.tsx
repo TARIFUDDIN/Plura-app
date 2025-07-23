@@ -9,14 +9,15 @@ import SendInvitation from '@/components/forms/send-invitation'
 import { getAgencyDetails, getAuthUserGroup } from '@/lib/queries';
 
 interface Props {
-  params: {
+  params: Promise<{
     agencyId: string
-  }
+  }>
 }
 
 const TeamPage = async ({ params }: Props) => {
-
-  const { agencyId } = params;
+  // Await params before destructuring
+  const { agencyId } = await params;
+  
   const authUser = await currentUser();
 
   if (!authUser) redirect("/agency/sign-in");

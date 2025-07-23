@@ -18,7 +18,7 @@ import { v4 } from 'uuid'
 
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
-import type { CreateFunnelFormSchema, CreateMediaType, UpsertFunnelPage } from './types'
+import type { CreateFunnelFormSchema, CreateMediaType, TicketAndTags, UpsertFunnelPage } from './types'
 
 export const getAuthUserDetails = async () => {
   const user = await currentUser()
@@ -601,6 +601,8 @@ export const getPipelineDetails=async (pipelineId: string)=>{
   })
   return response
 }
+
+// ✅ FIXED: Serialize Decimal values in tickets
 export const getLanesWithTicketAndTags = async (pipelineId: string) => {
   const response = await db.lane.findMany({
     where: {
@@ -620,8 +622,16 @@ export const getLanesWithTicketAndTags = async (pipelineId: string) => {
       },
     },
   })
-  return response
+  
+  return response.map(lane => ({
+    ...lane,
+    Tickets: lane.Tickets.map(ticket => ({
+      ...ticket,
+      value: ticket.value ? Number(ticket.value) : null,
+    })),
+  }))
 }
+
 export const upsertFunnel = async (
   subaccountId: string,
   funnel: z.infer<typeof CreateFunnelFormSchema> & { liveProducts: string },
@@ -697,8 +707,7 @@ export const createPipeline = async (subAccountId: string) => {
     console.log()
   }
 };
-
-export const updateTicketsOrder = async (tickets: Ticket[]) => {
+export const updateTicketsOrder = async (tickets: Array<Pick<TicketAndTags, 'id' | 'order' | 'laneId'>>) => {
   try {
     const updateTrans = tickets.map((ticket) =>
       db.ticket.update({
@@ -718,6 +727,7 @@ export const updateTicketsOrder = async (tickets: Ticket[]) => {
     console.log(error, '🔴 ERROR UPDATE TICKET ORDER')
   }
 }
+
 export const upsertLane = async (lane: Prisma.LaneUncheckedCreateInput) => {
   let order: number
 
@@ -747,7 +757,7 @@ export const deleteLane = async (laneId: string) => {
   return resposne
 }
 
-
+// ✅ FIXED: Serialize Decimal values in tickets
 export const getTicketsWithTags = async (pipelineId: string) => {
   const response = await db.ticket.findMany({
     where: {
@@ -757,9 +767,14 @@ export const getTicketsWithTags = async (pipelineId: string) => {
     },
     include: { Tags: true, Assigned: true, Customer: true },
   })
-  return response
+  
+  return response.map(ticket => ({
+    ...ticket,
+    value: ticket.value ? Number(ticket.value) : null,
+  }))
 }
 
+// ✅ FIXED: Serialize Decimal values in tickets
 export const _getTicketsWithAllRelations = async (laneId: string) => {
   const response = await db.ticket.findMany({
     where: { laneId: laneId },
@@ -770,8 +785,13 @@ export const _getTicketsWithAllRelations = async (laneId: string) => {
       Tags: true,
     },
   })
-  return response
+  
+  return response.map(ticket => ({
+    ...ticket,
+    value: ticket.value ? Number(ticket.value) : null,
+  }))
 }
+
 export const getSubAccountTeamMembers = async (subaccountId: string) => {
   const subaccountUsersWithAccess = await db.user.findMany({
     where: {
@@ -804,6 +824,8 @@ export const searchContacts = async (searchTerms: string) => {
 
   return response;
 };
+
+// ✅ FIXED: Serialize Decimal values in ticket
 export const upsertTicket = async (
   ticket: Prisma.TicketUncheckedCreateInput,
   tags: Tag[]
@@ -832,7 +854,10 @@ export const upsertTicket = async (
     },
   })
 
-  return response
+  return {
+    ...response,
+    value: response.value ? Number(response.value) : null,
+  }
 }
 
 export const deleteTicket = async (ticketId: string) => {
@@ -879,6 +904,8 @@ export const upsertContact = async (
   })
   return response
 }
+
+// ✅ FIXED: Serialize Decimal values in nested tickets
 export const getSubAccountWithContacts = async (subAccountId: string) => {
   const response = await db.subAccount.findUnique({
     where: {
@@ -900,8 +927,20 @@ export const getSubAccountWithContacts = async (subAccountId: string) => {
     },
   });
 
-  return response;
+  if (!response) return response;
+
+  return {
+    ...response,
+    Contact: response.Contact.map(contact => ({
+      ...contact,
+      Ticket: contact.Ticket.map(ticket => ({
+        ...ticket,
+        value: ticket.value ? Number(ticket.value) : null,
+      })),
+    })),
+  };
 };
+
 export const getAgencySubscription = async (agencyId: string) => {
   const agencySubscription = await db.agency.findUnique({
     where: {
@@ -1005,6 +1044,7 @@ export const getDomainContent = async (subDomainName: string) => {
   return response
 }
 
+// ✅ FIXED: Serialize Decimal values in nested tickets
 export const getPipelines = async (subaccountId: string) => {
   const response = await db.pipeline.findMany({
     where: { subAccountId: subaccountId },
@@ -1014,5 +1054,15 @@ export const getPipelines = async (subaccountId: string) => {
       },
     },
   })
-  return response
+  
+  return response.map(pipeline => ({
+    ...pipeline,
+    Lane: pipeline.Lane.map(lane => ({
+      ...lane,
+      Tickets: lane.Tickets.map(ticket => ({
+        ...ticket,
+        value: ticket.value ? Number(ticket.value) : null,
+      })),
+    })),
+  }))
 }

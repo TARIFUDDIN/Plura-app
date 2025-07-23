@@ -48,7 +48,7 @@ const FunnelEditorNavigation = ({
       type: 'SET_FUNNELPAGE_ID',
       payload: { funnelPageId: funnelPageDetails.id },
     })
-  }, [funnelPageDetails])
+  }, [funnelPageDetails, dispatch])
 
   const handleOnBlurTitleChange: FocusEventHandler<HTMLInputElement> = async (
     event
@@ -128,7 +128,7 @@ const FunnelEditorNavigation = ({
           <Link href={`/subaccount/${subaccountId}/funnels/${funnelId}`}>
             <ArrowLeftCircle />
           </Link>
-          <div className="flex flex-col w-full ">
+          <div className="flex flex-col w-full">
             <Input
               defaultValue={funnelPageDetails.name}
               className="border-none h-5 m-0 p-0 text-lg"
@@ -142,7 +142,7 @@ const FunnelEditorNavigation = ({
         <aside>
           <Tabs
             defaultValue="Desktop"
-            className="w-fit "
+            className="w-fit"
             value={state.editor.device}
             onValueChange={(value) => {
               dispatch({
@@ -153,7 +153,7 @@ const FunnelEditorNavigation = ({
           >
             <TabsList className="grid w-full grid-cols-3 bg-transparent h-fit">
               <Tooltip>
-                <TooltipTrigger>
+                <TooltipTrigger asChild>
                   <TabsTrigger
                     value="Desktop"
                     className="data-[state=active]:bg-muted w-10 h-10 p-0"
@@ -166,7 +166,7 @@ const FunnelEditorNavigation = ({
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
-                <TooltipTrigger>
+                <TooltipTrigger asChild>
                   <TabsTrigger
                     value="Tablet"
                     className="w-10 h-10 p-0 data-[state=active]:bg-muted"
@@ -179,7 +179,7 @@ const FunnelEditorNavigation = ({
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
-                <TooltipTrigger>
+                <TooltipTrigger asChild>
                   <TabsTrigger
                     value="Mobile"
                     className="w-10 h-10 p-0 data-[state=active]:bg-muted"
@@ -196,7 +196,7 @@ const FunnelEditorNavigation = ({
         </aside>
         <aside className="flex items-center gap-2">
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild>
               <ModeToggle className="h-10 w-10 rounded-md" />
             </TooltipTrigger>
             <TooltipContent>
@@ -217,20 +217,20 @@ const FunnelEditorNavigation = ({
               <p className="inline-flex items-center gap-2">
                 Preview{" "}
                 <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                  <div className="text-xs">⌘</div>P
+                  <span className="text-xs">⌘</span>P
                 </kbd>
               </p>
             </TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-            <Button
-            disabled={!(state.history.currentIndex > 0)}
-            onClick={handleUndo}
-            variant={'ghost'}
-            size={'icon'}
-            className="hover:bg-slate-800"
-          >
+              <Button
+                disabled={!(state.history.currentIndex > 0)}
+                onClick={handleUndo}
+                variant="ghost"
+                size="icon"
+                className="hover:bg-slate-800"
+              >
                 <Undo2 className="w-5 h-5" aria-label="Undo" />
               </Button>
             </TooltipTrigger>
@@ -238,23 +238,22 @@ const FunnelEditorNavigation = ({
               <p className="inline-flex items-center gap-2">
                 Undo{" "}
                 <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                  <div className="text-xs">⌘</div>Z
+                  <span className="text-xs">⌘</span>Z
                 </kbd>
               </p>
             </TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-            <Button
-            disabled={
-              !(state.history.currentIndex < state.history.history.length - 1)
-            }
-            onClick={handleRedo}
-            variant={'ghost'}
-            size={'icon'}
-            className="hover:bg-slate-800 mr-4"
-          >
-            
+              <Button
+                disabled={
+                  !(state.history.currentIndex < state.history.history.length - 1)
+                }
+                onClick={handleRedo}
+                variant="ghost"
+                size="icon"
+                className="hover:bg-slate-800 mr-4"
+              >
                 <Redo2 className="w-5 h-5" aria-label="Redo" />
               </Button>
             </TooltipTrigger>
@@ -262,7 +261,7 @@ const FunnelEditorNavigation = ({
               <p className="inline-flex items-center gap-2">
                 Redo{" "}
                 <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                  <div className="text-xs">⌘</div>Y
+                  <span className="text-xs">⌘</span>Y
                 </kbd>
               </p>
             </TooltipContent>

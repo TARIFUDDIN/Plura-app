@@ -23,22 +23,25 @@ type Props = {
   subaccountId: string
   pipelineDetails: PipelineDetailsWithLanesCardsTagsTickets
   updateLanesOrder: (lanes: Lane[]) => Promise<void>
-  updateTicketsOrder: (tickets: Ticket[]) => Promise<void>
+  updateTicketsOrder: (tickets: TicketAndTags[]) => Promise<void>
 }
 
-// StrictModeDroppable Component
+// Fixed StrictModeDroppable Component
 const StrictModeDroppable = ({ children, droppableId, type, direction }: any) => {
   const [enabled, setEnabled] = useState(false)
 
   useEffect(() => {
-    const timeout = setTimeout(() => setEnabled(true), 0)
-    return () => clearTimeout(timeout)
+    const animation = requestAnimationFrame(() => setEnabled(true))
+    return () => {
+      cancelAnimationFrame(animation)
+      setEnabled(false)
+    }
   }, [])
 
   if (!enabled) return null
 
   return (
-    <Droppable droppableId={droppableId} type={type} direction={direction}>
+    <Droppable droppableId={droppableId} type={type} direction={direction} isDropDisabled={false}>
       {children}
     </Droppable>
   )
@@ -96,6 +99,7 @@ const PipelineView = ({
 
         setAllLanes(newLanes)
         updateLanesOrder(newLanes)
+        break // Added missing break statement
       }
 
       case 'ticket': {
@@ -144,10 +148,10 @@ const PipelineView = ({
           ])
           router.refresh()
         }
+        break // Added missing break statement
       }
     }
   }
-
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>

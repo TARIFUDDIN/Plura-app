@@ -30,14 +30,14 @@ const FunnelEditorSidebar = ({ subaccountId }: Props) => {
       modal={false}
     >
       <Tabs
-        className="w-full "
+        className="w-full"
         defaultValue="Settings"
       >
         <SheetContent
           showX={false}
           side="right"
           className={clsx(
-            'mt-[97px] w-16 z-[80] shadow-none  p-0 focus:border-none transition-all overflow-hidden',
+            'mt-[97px] w-16 z-[80] shadow-none p-0 focus:border-none transition-all overflow-hidden',
             { hidden: state.editor.previewMode }
           )}
         >
@@ -47,20 +47,19 @@ const FunnelEditorSidebar = ({ subaccountId }: Props) => {
           showX={false}
           side="right"
           className={clsx(
-            'mt-[97px] w-80 z-[40] shadow-none p-0 mr-16 bg-background h-full transition-all overflow-hidden ',
+            'mt-[97px] w-80 z-[40] shadow-none p-0 mr-16 bg-background h-full transition-all overflow-hidden',
             { hidden: state.editor.previewMode }
           )}
         >
           <div className="grid gap-4 h-full pb-36 overflow-scroll">
             <TabsContent value="Settings">
-              
               <SettingsTab />
             </TabsContent>
             <TabsContent value="Media">
               <MediaBucketTab subaccountId={subaccountId} />
             </TabsContent>
             <TabsContent value="Components">
-              <SheetHeader className="text-left p-6 ">
+              <SheetHeader className="text-left p-6">
                 <SheetTitle>Components</SheetTitle>
                 <SheetDescription>
                   You can drag and drop components on the canvas
@@ -68,7 +67,6 @@ const FunnelEditorSidebar = ({ subaccountId }: Props) => {
               </SheetHeader>
               <ComponentsTab />
             </TabsContent>
-          
           </div>
         </SheetContent>
       </Tabs>

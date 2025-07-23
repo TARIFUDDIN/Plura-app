@@ -1,6 +1,5 @@
 import React from "react";
 import { redirect } from "next/navigation";
-import { Decimal } from "@prisma/client/runtime/library";
 import { format } from "date-fns";
 
 import { getSubAccountWithContacts } from "@/lib/queries";
@@ -20,26 +19,28 @@ import { Badge } from "@/components/ui/badge";
 import CreateContactButton from "./_components/create-contact-btn";
 
 interface SubAccountContactPageProps {
-  params: {
+  params: Promise<{
     subaccountId: string | undefined;
-  };
+  }>;
 }
 
 const SubAccountContactPage: React.FC<SubAccountContactPageProps> = async ({
   params,
 }) => {
-  const { subaccountId } = params;
+  // Await params before using its properties
+  const { subaccountId } = await params;
 
   if (!subaccountId) redirect("/subaccount/unauthorized");
 
   const contacts = await getSubAccountWithContacts(subaccountId);
   const allContacts = contacts?.Contact;
 
-  const formatTotal = (tickets: { value: Decimal | null }[]) => {
+  // Updated formatTotal to work with number instead of Decimal
+  const formatTotal = (tickets: { value: number | null }[]) => {
     if (!tickets || !tickets.length) return null;
 
     const laneAmt = tickets.reduce(
-      (sum, ticket) => sum + (Number(ticket.value) || 0),
+      (sum, ticket) => sum + (ticket.value || 0),
       0,
     );
 

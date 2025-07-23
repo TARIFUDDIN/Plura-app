@@ -8,16 +8,16 @@ import FunnelEditor from './_components/funnel-editor'
 import { constructMetadata } from '@/lib/utils'
 
 type Props = {
-  params: {
+  params: Promise<{
     subaccountId: string
     funnelId: string
     funnelPageId: string
-  }
+  }>
 }
 
 const Page = async ({ params }: Props) => {
-  // Make sure params is fully resolved before using its properties
-  const { subaccountId, funnelId, funnelPageId } = params;
+  // Await params before destructuring
+  const { subaccountId, funnelId, funnelPageId } = await params;
   
   const funnelPageDetails = await db.funnelPage.findFirst({
     where: {

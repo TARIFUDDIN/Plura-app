@@ -14,20 +14,19 @@ import PipelineSettings from '../_components/pipeline-settings'
 import PipelineView from '../_components/pipeline-view'
 
 type Props = {
-  params: {
+  params: Promise<{
     subaccountId: string
     pipelineId: string
-  }
+  }>
 }
 
 const PipelinePage = async ({ params }: Props) => {
-  // First await the params
-  const { subaccountId, pipelineId } = params
+  // ✅ Await params first
+  const { subaccountId, pipelineId } = await params
+  
   if (!subaccountId) redirect(`/subaccount/unauthorized`);
   if (!pipelineId) redirect(`/subaccount/${subaccountId}/pipelines`);
-
-  
-
+      
   // Get pipeline details
   const pipelineDetails = await getPipelineDetails(pipelineId)
   if (!pipelineDetails) {
@@ -43,6 +42,7 @@ const PipelinePage = async ({ params }: Props) => {
   const lanes = (await getLanesWithTicketAndTags(
     pipelineId
   )) as LaneDetail[]
+  
   return (
     <Tabs
       defaultValue="view"
@@ -51,7 +51,7 @@ const PipelinePage = async ({ params }: Props) => {
       <TabsList className="bg-transparent border-b-2 h-16 w-full justify-between mb-4">
         <PipelineInfoBar
           pipelineId={pipelineId}
-          subAccountId={subaccountId}
+          subaccountId={subaccountId}
           pipelines={pipelines}
         />
         <div>
@@ -61,7 +61,7 @@ const PipelinePage = async ({ params }: Props) => {
       </TabsList>
 
       <TabsContent value="view" className="h-full w-full">
-      <PipelineView
+        <PipelineView
           lanes={lanes}
           pipelineDetails={pipelineDetails}
           pipelineId={pipelineId}
@@ -72,9 +72,9 @@ const PipelinePage = async ({ params }: Props) => {
       </TabsContent>
       <TabsContent value="settings">
         <PipelineSettings
-        pipelineId={pipelineId}
-        pipelines={pipelines}
-        subaccountId={subaccountId}
+          pipelineId={pipelineId}
+          pipelines={pipelines}
+          subaccountId={subaccountId}
         />
       </TabsContent>
     </Tabs>

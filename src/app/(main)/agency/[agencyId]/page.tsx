@@ -1,4 +1,3 @@
-
 import {
   Card,
   CardContent,
@@ -23,9 +22,12 @@ import React from 'react'
 const Page = async ({
   params,
 }: {
-  params: { agencyId: string }
+  params: Promise<{ agencyId: string }>
   searchParams: { code: string }
 }) => {
+  // Await params before using its properties
+  const { agencyId } = await params
+  
   let currency = 'USD'
   let sessions
   let totalClosedSessions
@@ -37,7 +39,7 @@ const Page = async ({
 
   const agencyDetails = await db.agency.findUnique({
     where: {
-      id: params.agencyId,
+      id: agencyId,
     },
   })
 
@@ -45,7 +47,7 @@ const Page = async ({
 
   const subaccounts = await db.subAccount.findMany({
     where: {
-      agencyId: params.agencyId,
+      agencyId: agencyId,
     },
   })
 
@@ -100,11 +102,12 @@ const Page = async ({
           <Card className="flex-1 relative">
             <CardHeader>
               <CardTitle>Agency Goal</CardTitle>
+              {/* Fixed: Changed CardDescription to div to avoid nested p tags */}
               <CardDescription>
-                <p className="mt-2">
+                <span className="mt-2 block">
                   Reflects the number of sub accounts you want to own and
                   manage.
-                </p>
+                </span>
               </CardDescription>
             </CardHeader>
             <CardFooter>

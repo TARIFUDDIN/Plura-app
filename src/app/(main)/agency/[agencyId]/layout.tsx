@@ -1,4 +1,3 @@
-
 import BlurPage from '@/components/common/BlurPage'
 import InfoBar from '@/components/common/infoBar'
 import Unauthorized from '@/components/common/Unauthorized'
@@ -13,10 +12,13 @@ import React from 'react'
 
 type Props = {
   children: React.ReactNode
-  params: { agencyId: string }
+  params: Promise<{ agencyId: string }>
 }
 
 const layout = async ({ children, params }: Props) => {
+  // Await params before using its properties
+  const { agencyId: paramsAgencyId } = await params
+  
   const agencyId = await verifyAndAcceptInvitation()
   const user = await currentUser()
 
@@ -38,12 +40,10 @@ const layout = async ({ children, params }: Props) => {
   const notifications = await getNotificationAndUser(agencyId)
   if (notifications) allNoti = notifications
 
- 
-
   return (
     <div className="h-screen overflow-hidden">
       <Sidebar
-        id={params.agencyId}
+        id={paramsAgencyId}
         type="agency"
       />
       <div className="md:pl-[300px]">

@@ -1,4 +1,3 @@
-
 import BlurPage from '@/components/common/BlurPage'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,17 +16,21 @@ import Link from 'next/link'
 import React from 'react'
 
 type Props = {
-  searchParams: {
+  searchParams: Promise<{
     state: string
     code: string
-  }
-  params: { subaccountId: string }
+  }>
+  params: Promise<{ subaccountId: string }>
 }
 
 const LaunchPad = async ({ params, searchParams }: Props) => {
+  // Await both params and searchParams
+  const { subaccountId } = await params;
+  const searchParamsData = await searchParams;
+
   const subaccountDetails = await db.subAccount.findUnique({
     where: {
-      id: params.subaccountId,
+      id: subaccountId,
     },
   })
 
@@ -52,15 +55,15 @@ const LaunchPad = async ({ params, searchParams }: Props) => {
 
   let connectedStripeAccount = false
 
-  if (searchParams.code) {
+  if (searchParamsData.code) {
     if (!subaccountDetails.connectAccountId) {
       try {
         const response = await stripe.oauth.token({
           grant_type: 'authorization_code',
-          code: searchParams.code,
+          code: searchParamsData.code,
         })
         await db.subAccount.update({
-          where: { id: params.subaccountId },
+          where: { id: subaccountId },
           data: { connectAccountId: response.stripe_user_id },
         })
         connectedStripeAccount = true

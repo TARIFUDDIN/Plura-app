@@ -185,7 +185,8 @@ export const StickyScroll = ({
               >
                 {item.title}
               </motion.h2>
-              <motion.p
+              {/* Changed from motion.p to motion.div to fix nested p tag issue */}
+              <motion.div
                 initial={{
                   opacity: 0,
                 }}
@@ -195,7 +196,7 @@ export const StickyScroll = ({
                 className="max-w-md mt-4 space-y-2"
               >
                 {item.description}
-              </motion.p>
+              </motion.div>
             </div>
           ))}
           <div className="h-40" />

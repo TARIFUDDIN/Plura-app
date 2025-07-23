@@ -14,16 +14,18 @@ import React from 'react'
 
 interface SubAccountIdLayoutProps {
   children: React.ReactNode;
-  params: {
+  params: Promise<{
     subaccountId: string | undefined;
-  };
+  }>;
 }
 
 const SubAccountIdLayout: React.FC<SubAccountIdLayoutProps> = async ({
   children,
   params,
 }) => {
-  const { subaccountId } = params;
+  // Await params before using its properties
+  const { subaccountId } = await params;
+  
   const agencyId = await verifyAndAcceptInvitation();
 
   if (!subaccountId) redirect(`/subaccount/unauthorized`);
@@ -68,7 +70,7 @@ const SubAccountIdLayout: React.FC<SubAccountIdLayoutProps> = async ({
         <InfoBar
           notifications={notifications}
           role={user.privateMetadata.role as Role}
-          subAccountId={params.subaccountId as string}
+          subAccountId={subaccountId as string}
         />
         <div className="relative">{children}</div>
       </div>

@@ -10,15 +10,16 @@ import FunnelSettings from './_components/funnel-settings'
 import { constructMetadata } from '@/lib/utils'
 
 type Props = {
-  params: {
+  params: Promise<{
     funnelId: string
     subaccountId: string
-  }
+  }>
 }
 
 const FunnelPage = async ({ params }: Props) => {
-  // Destructure params to ensure they're accessed after promise resolution
-  const { funnelId, subaccountId } = params
+  // Await params before destructuring
+  const { funnelId, subaccountId } = await params
+  
   const funnelPages = await getFunnel(funnelId)
 
   if (!funnelPages)

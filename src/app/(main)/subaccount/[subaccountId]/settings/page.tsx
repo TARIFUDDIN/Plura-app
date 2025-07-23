@@ -10,11 +10,12 @@ import SubAccountDetails from '@/components/forms/SubAccountDetails';
 import UserDetails from '@/components/forms/UserDetails';
 
 type Props = {
-  params: { subaccountId: string }
+  params: Promise<{ subaccountId: string }>
 }
 
 const SubaccountSettingPage = async ({ params }: Props) => {
-    const { subaccountId } = params;
+    // Await params before using its properties
+    const { subaccountId } = await params;
     const authUser = await currentUser();
   
     if (!subaccountId) redirect("/subaccount/unauthorized");
@@ -50,7 +51,7 @@ const SubaccountSettingPage = async ({ params }: Props) => {
         />
         <UserDetails
           type="subaccount"
-          id={params.subaccountId}
+          id={subaccountId}
           subAccounts={subAccounts}
           userData={userDetails}
         />

@@ -1,11 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { 
   DragDropContext, 
   Droppable, 
   Draggable, 
-  DropResult 
+  DropResult,
+  DroppableProvided
 } from 'react-beautiful-dnd'
 import { AlertDialog } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
@@ -33,6 +34,27 @@ type Props = {
   subaccountId: string
   pages: FunnelPage[]
   funnelId: string
+}
+
+// StrictModeDroppable Component
+const StrictModeDroppable = ({ children, droppableId, direction }: any) => {
+  const [enabled, setEnabled] = useState(false)
+
+  useEffect(() => {
+    const animation = requestAnimationFrame(() => setEnabled(true))
+    return () => {
+      cancelAnimationFrame(animation)
+      setEnabled(false)
+    }
+  }, [])
+
+  if (!enabled) return null
+
+  return (
+    <Droppable droppableId={droppableId} direction={direction} isDropDisabled={false}>
+      {children}
+    </Droppable>
+  )
 }
 
 export default function FunnelSteps({ 
@@ -99,6 +121,7 @@ export default function FunnelSteps({
       key={page.id} 
       draggableId={`page-${page.id}`} 
       index={index}
+      isDragDisabled={false}
     >
       {(provided, snapshot) => (
         <Card
@@ -110,7 +133,7 @@ export default function FunnelSteps({
           }`}
           onClick={() => setClickedPage(page)}
         >
-          <div className="p-0 flex items-center gap-4 flex-row p-2">
+          <div className="p-2 flex items-center gap-4 flex-row">
             <div className="h-14 w-14 bg-muted flex items-center justify-center relative">
               <Mail />
               <ArrowDown
@@ -118,7 +141,7 @@ export default function FunnelSteps({
                 className="absolute -bottom-2 text-primary"
               />
             </div>
-            {page.name}
+            <span>{page.name}</span>
           </div>
           {page.id === clickedPage?.id && (
             <div className="w-2 top-2 right-2 h-2 absolute bg-emerald-500 rounded-full" />
@@ -130,29 +153,30 @@ export default function FunnelSteps({
 
   return (
     <AlertDialog>
-      <div className="flex border-[1px] lg:!flex-row flex-col">
+      <div className="flex border lg:flex-row flex-col">
         <aside className="flex-[0.3] bg-background p-6 flex flex-col justify-between">
           <ScrollArea className="h-full">
-            <div className="flex gap-4 items-center">
+            <div className="flex gap-4 items-center mb-4">
               <Check />
-              Funnel Steps
+              <span>Funnel Steps</span>
             </div>
             {pagesState.length ? (
               <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable 
+                <StrictModeDroppable 
                   droppableId="funnel-pages" 
                   direction="vertical"
                 >
-                  {(provided) => (
+                  {(provided: DroppableProvided) => (
                     <div
                       {...provided.droppableProps}
                       ref={provided.innerRef}
+                      className="space-y-2"
                     >
                       {pagesState.map(renderFunnelStepCard)}
                       {provided.placeholder}
                     </div>
                   )}
-                </Droppable>
+                </StrictModeDroppable>
               </DragDropContext>
             ) : (
               <div className="text-center text-muted-foreground py-6">
@@ -181,11 +205,11 @@ export default function FunnelSteps({
           </Button>
         </aside>
 
-        <aside className="flex-[0.7] bg-muted p-4 ">
+        <aside className="flex-[0.7] bg-muted p-4">
           {!!pages.length ? (
             <Card className="h-full flex justify-between flex-col">
               <CardHeader>
-                <p className="text-sm text-muted-foreground">Page name</p>
+                <div className="text-sm text-muted-foreground">Page name</div>
                 <CardTitle>{clickedPage?.name}</CardTitle>
                 <CardDescription className="flex flex-col gap-4">
                   <div className="border-2 rounded-lg sm:w-80 w-full overflow-clip">
@@ -208,7 +232,7 @@ export default function FunnelSteps({
                       className="group flex items-center justify-start p-2 gap-2 hover:text-primary transition-colors duration-200"
                     >
                       <ExternalLink size={15} />
-                      <div className="w-64 overflow-hidden overflow-ellipsis ">
+                      <div className="w-64 overflow-hidden overflow-ellipsis">
                         {process.env.NEXT_PUBLIC_SCHEME}
                         {funnel.subDomainName}.{process.env.NEXT_PUBLIC_DOMAIN}/
                         {clickedPage?.pathName}

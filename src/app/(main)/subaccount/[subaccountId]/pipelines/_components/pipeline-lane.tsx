@@ -122,6 +122,7 @@ const PipelineLane: React.FC<PipelineLaneProps> = ({
       draggableId={laneDetails?.id.toString() || 'default-id'}
       index={index}
       key={laneDetails?.id}
+      isDragDisabled={false}
     >
       {(provided, snapshot) => (
         <div
@@ -161,6 +162,7 @@ const PipelineLane: React.FC<PipelineLaneProps> = ({
                   droppableId={laneDetails?.id || 'default-id'}
                   key={laneDetails?.id}
                   type="ticket"
+                  isDropDisabled={false}
                 >
                   {(provided) => (
                     <div

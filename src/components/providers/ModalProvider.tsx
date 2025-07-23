@@ -1,6 +1,4 @@
-
 'use client'
-
 
 import { createContext, useContext, useEffect, useState } from 'react'
 
@@ -11,7 +9,6 @@ import {
   type User,
 } from "@prisma/client";
 import type { PricesList, TicketDetails } from '@/lib/types';
-
 
 export interface ModalData {
   user?: User;
@@ -37,6 +34,7 @@ export const ModalContext = createContext<ModalContextType>({
   setOpen: (modal: React.ReactNode, fetchData?: () => Promise<any>) => {},
   setClose: () => {},
 })
+
 export const ModalProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
@@ -60,21 +58,15 @@ export const ModalProvider: React.FC<React.PropsWithChildren> = ({
     }
   };
 
-  
-  
   const setClose = () => {
     setIsOpen(false);
     setData({});
   };
 
-  if (!isMounted) {
-    return null;
-  }
-
   return (
     <ModalContext.Provider value={{ data, setOpen, setClose, isOpen }}>
       {children}
-      {showingModal}
+      {isMounted && showingModal}
     </ModalContext.Provider>
   )
 }
