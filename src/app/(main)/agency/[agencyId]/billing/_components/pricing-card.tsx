@@ -15,6 +15,9 @@ import { useModal } from '@/components/providers/ModalProvider'
 import { useSearchParams } from 'next/navigation'
 import React from 'react'
 
+// Import the Plan enum from your Prisma client
+import { Plan } from '@prisma/client'
+
 type Props = {
   features: string[]
   buttonCta: string
@@ -47,6 +50,38 @@ const PricingCard = ({
   const plan = searchParams.get('plan')
 
   const handleManagePlan = async () => {
+    // Convert the string plan to the Plan enum type
+    const getValidPlan = (planString: string | null): Plan => {
+      // Check if the plan string matches one of the enum values
+      if (planString === 'price_1RHr7JR8CMCKQcT941eHzkBh') {
+        return Plan.price_1RHr7JR8CMCKQcT941eHzkBh
+      }
+      if (planString === 'price_1RHr7JR8CMCKQcT9DSJh8PTr') {
+        return Plan.price_1RHr7JR8CMCKQcT9DSJh8PTr
+      }
+      // Default to the first plan if no match or null
+      return Plan.price_1RHr7JR8CMCKQcT941eHzkBh
+    }
+
+    // Alternative approach: find the plan from prices array
+    const getValidPlanFromPrices = (): Plan => {
+      if (plan && prices.length > 0) {
+        // Find the price that matches the plan ID
+        const matchingPrice = prices.find(price => price.id === plan)
+        if (matchingPrice) {
+          // Check if the price ID is one of our valid enum values
+          if (matchingPrice.id === 'price_1RHr7JR8CMCKQcT941eHzkBh') {
+            return Plan.price_1RHr7JR8CMCKQcT941eHzkBh
+          }
+          if (matchingPrice.id === 'price_1RHr7JR8CMCKQcT9DSJh8PTr') {
+            return Plan.price_1RHr7JR8CMCKQcT9DSJh8PTr
+          }
+        }
+      }
+      // Default fallback
+      return Plan.price_1RHr7JR8CMCKQcT941eHzkBh
+    }
+
     setOpen(
       <CustomModal
         title={'Manage Your Plan'}
@@ -59,12 +94,13 @@ const PricingCard = ({
       </CustomModal>,
       async () => ({
         plans: {
-          defaultPriceId: plan ? plan : '',
+          defaultPriceId: getValidPlanFromPrices(), // Now returns Plan enum type
           plans: prices,
         },
       })
     )
   }
+
   return (
     <Card className="flex flex-col justify-between lg:w-1/2">
       <div>
