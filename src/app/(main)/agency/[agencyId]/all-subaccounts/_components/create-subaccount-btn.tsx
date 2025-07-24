@@ -22,10 +22,11 @@ type Props = {
         )
       | null
   }
+  id: string  // Add this line - this is the agencyId being passed from parent
   className: string
 }
 
-const CreateSubaccountButton = ({ className, user }: Props) => {
+const CreateSubaccountButton = ({ className, user, id }: Props) => {
   const { setOpen } = useModal()
   const agencyDetails = user.Agency
 
