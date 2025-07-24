@@ -1,14 +1,11 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useScroll, useTransform, motion } from "framer-motion";
+import { useScroll, useTransform, motion, MotionValue } from "framer-motion";
 import Image from "next/image";
 import { TypewriterEffect } from "./TypewritterEffect";
 
-
-interface HeroContainerScrollProps {}
-
-export const HeroContainerScroll: React.FC<HeroContainerScrollProps> = () => {
+export const HeroContainerScroll: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -18,15 +15,18 @@ export const HeroContainerScroll: React.FC<HeroContainerScrollProps> = () => {
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
 
-    let resizeTimeout: NodeJS.Timeout; // Temporary variable for debouncing
+    let resizeTimeout: NodeJS.Timeout;
     const handleResize = () => {
       clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(checkMobile, 150); // Debounce resize
+      resizeTimeout = setTimeout(checkMobile, 150);
     };
 
     checkMobile();
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(resizeTimeout);
+    };
   }, []);
 
   const scaleDimensions = isMobile ? [0.7, 0.9] : [1.05, 1];
@@ -71,7 +71,6 @@ export const HeroContainerScroll: React.FC<HeroContainerScrollProps> = () => {
             </div>
             <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-primary/0 via-primary/90 to-primary/0 transition-opacity duration-500 group-hover:opacity-40"></span>
           </a>
-          {/* Changed from <p> to <div> to fix hydration error */}
           <div className="text-center font-medium mt-4 z-[99999]">
             <TypewriterEffect />
           </div>
@@ -89,8 +88,8 @@ export const HeroContainerScroll: React.FC<HeroContainerScrollProps> = () => {
 };
 
 interface CardProps {
-  rotate: any;
-  scale: any;
+  rotate: MotionValue<number>;
+  scale: MotionValue<number>;
 }
 
 const Card: React.FC<CardProps> = ({ rotate, scale }) => {
