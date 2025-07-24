@@ -67,12 +67,19 @@ export type GetMediaFiles = Prisma.PromiseReturnType<typeof getMedia>
 
 // ✅ FIXED: Updated TicketAndTags to use number instead of Decimal
 export type TicketAndTags = Omit<Ticket, 'value'> & {
-  value: number | null  // Changed from Decimal to number
+  value: number | null
+  Lane: {
+    id: string
+    name: string
+    createdAt: Date
+    updatedAt: Date
+    order: number
+    pipelineId: string
+  }
   Tags: Tag[]
   Assigned: User | null
   Customer: Contact | null
 }
-
 // ✅ FIXED: Updated LaneDetail to use the new TicketAndTags type
 export type LaneDetail = Lane & {
   Tickets: TicketAndTags[]

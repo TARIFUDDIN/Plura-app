@@ -69,7 +69,20 @@ const PipelineView = ({
 
   useEffect(() => {
     setAllLanes(lanes)
-    const tickets: TicketAndTags[] = lanes.flatMap(lane => lane.Tickets)
+    // ✅ FIXED: Transform tickets to include Lane information
+    const tickets: TicketAndTags[] = lanes.flatMap(lane => 
+      lane.Tickets.map(ticket => ({
+        ...ticket,
+        Lane: {
+          id: lane.id,
+          name: lane.name,
+          createdAt: lane.createdAt,
+          updatedAt: lane.updatedAt,
+          order: lane.order,
+          pipelineId: lane.pipelineId
+        }
+      }))
+    )
     setAllTickets(tickets)
   }, [lanes])
 
@@ -106,7 +119,7 @@ const PipelineView = ({
 
         setAllLanes(newLanes)
         updateLanesOrder(newLanes)
-        break // Added missing break statement
+        break
       }
 
       case 'ticket': {
@@ -131,7 +144,20 @@ const PipelineView = ({
             })
           originLane.Tickets = newOrderedTickets
           setAllLanes(newLanes)
-          updateTicketsOrder(newOrderedTickets)
+          
+          // ✅ FIXED: Transform tickets to include Lane information when updating
+          const ticketsWithLane = newOrderedTickets.map(ticket => ({
+            ...ticket,
+            Lane: {
+              id: originLane.id,
+              name: originLane.name,
+              createdAt: originLane.createdAt,
+              updatedAt: originLane.updatedAt,
+              order: originLane.order,
+              pipelineId: originLane.pipelineId
+            }
+          }))
+          updateTicketsOrder(ticketsWithLane)
           router.refresh()
         } else {
           const [currentTicket] = originLane.Tickets.splice(source.index, 1)
@@ -149,13 +175,37 @@ const PipelineView = ({
             ticket.order = idx
           })
           setAllLanes(newLanes)
-          updateTicketsOrder([
-            ...destinationLane.Tickets,
-            ...originLane.Tickets,
-          ])
+          
+          // ✅ FIXED: Transform tickets to include Lane information
+          const allUpdatedTickets = [
+            ...destinationLane.Tickets.map(ticket => ({
+              ...ticket,
+              Lane: {
+                id: destinationLane.id,
+                name: destinationLane.name,
+                createdAt: destinationLane.createdAt,
+                updatedAt: destinationLane.updatedAt,
+                order: destinationLane.order,
+                pipelineId: destinationLane.pipelineId
+              }
+            })),
+            ...originLane.Tickets.map(ticket => ({
+              ...ticket,
+              Lane: {
+                id: originLane.id,
+                name: originLane.name,
+                createdAt: originLane.createdAt,
+                updatedAt: originLane.updatedAt,
+                order: originLane.order,
+                pipelineId: originLane.pipelineId
+              }
+            }))
+          ]
+          
+          updateTicketsOrder(allUpdatedTickets)
           router.refresh()
         }
-        break // Added missing break statement
+        break
       }
     }
   }
@@ -192,7 +242,17 @@ const PipelineView = ({
                     setAllTickets={setAllTickets}
                     subaccountId={subaccountId}
                     pipelineId={pipelineId}
-                    tickets={lane.Tickets}
+                    tickets={lane.Tickets.map(ticket => ({
+                      ...ticket,
+                      Lane: {
+                        id: lane.id,
+                        name: lane.name,
+                        createdAt: lane.createdAt,
+                        updatedAt: lane.updatedAt,
+                        order: lane.order,
+                        pipelineId: lane.pipelineId
+                      }
+                    }))}
                     laneDetails={lane}
                     index={index}
                   />
