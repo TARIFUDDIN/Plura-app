@@ -34,133 +34,136 @@ import { deleteUser, getUser } from '@/lib/queries'
 import { useToast } from '@/components/ui/use-toast'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { UsersWithAgencySubAccountPermissionsSidebarOptions } from '@/lib/types'
 import CustomModal from '@/components/global/custom-modal'
 
-// Define the Permission type based on your Prisma schema
-type Permission = {
-  id: string
-  email: string
-  subAccountId: string
-  access: boolean
-  SubAccount: {
-    id: string
-    name: string
-    // Add other SubAccount properties as needed
+// ✅ FIXED: Create a type that exactly matches the Prisma query return type
+import type { Prisma } from '@prisma/client'
+
+// Create the exact type that matches your getAuthUserGroup query
+type TeamMemberData = Prisma.UserGetPayload<{
+  include: {
+    Agency: { 
+      include: { 
+        SubAccount: true 
+      } 
+    },
+    Permissions: { 
+      include: { 
+        SubAccount: true 
+      } 
+    }
   }
-}
+}> 
 
-export const columns: ColumnDef<UsersWithAgencySubAccountPermissionsSidebarOptions>[] =
-  [
-    {
-      accessorKey: 'id',
-      header: '',
-      cell: () => {
-        return null
-      },
+// ✅ FIXED: Use the correct type for columns
+export const columns: ColumnDef<TeamMemberData>[] = [
+  {
+    accessorKey: 'id',
+    header: '',
+    cell: () => {
+      return null
     },
-    {
-      accessorKey: 'name',
-      header: 'Name',
-      cell: ({ row }) => {
-        const avatarUrl = row.getValue('avatarUrl') as string
-        return (
-          <div className="flex items-center gap-4">
-            <div className="h-11 w-11 relative flex-none">
-              <Image
-                src={avatarUrl}
-                fill
-                className="rounded-full object-cover"
-                alt="avatar image"
-              />
-            </div>
-            <span>{row.getValue('name')}</span>
+  },
+  {
+    accessorKey: 'name',
+    header: 'Name',
+    cell: ({ row }) => {
+      const avatarUrl = row.getValue('avatarUrl') as string
+      return (
+        <div className="flex items-center gap-4">
+          <div className="h-11 w-11 relative flex-none">
+            <Image
+              src={avatarUrl}
+              fill
+              className="rounded-full object-cover"
+              alt="avatar image"
+            />
           </div>
-        )
-      },
+          <span>{row.getValue('name')}</span>
+        </div>
+      )
     },
-    {
-      accessorKey: 'avatarUrl',
-      header: '',
-      cell: () => {
-        return null
-      },
+  },
+  {
+    accessorKey: 'avatarUrl',
+    header: '',
+    cell: () => {
+      return null
     },
-    { accessorKey: 'email', header: 'Email' },
+  },
+  { accessorKey: 'email', header: 'Email' },
+  {
+    accessorKey: 'SubAccount',
+    header: 'Owned Accounts',
+    cell: ({ row }) => {
+      const rowData = row.original
+      if (!rowData) return null
+      
+      const isAgencyOwner = row.getValue('role') === 'AGENCY_OWNER'
+      const ownedAccounts = rowData.Permissions?.filter(
+        (per) => per.access
+      )
 
-    {
-      accessorKey: 'SubAccount',
-      header: 'Owned Accounts',
-      cell: ({ row }) => {
-        // ✅ FIXED: Add null check for row.original
-        if (!row.original) return null
-        
-        const isAgencyOwner = row.getValue('role') === 'AGENCY_OWNER'
-        const ownedAccounts = row.original.Permissions?.filter(
-          (per: Permission) => per.access  // ✅ FIXED: Use proper Permission type instead of any
-        )
-
-        if (isAgencyOwner)
-          return (
-            <div className="flex flex-col items-start">
-              <div className="flex flex-col gap-2">
-                <Badge className="bg-slate-600 whitespace-nowrap">
-                  Agency - {row.original.Agency?.name}
-                </Badge>
-              </div>
-            </div>
-          )
+      if (isAgencyOwner)
         return (
           <div className="flex flex-col items-start">
             <div className="flex flex-col gap-2">
-              {ownedAccounts?.length ? (
-                ownedAccounts.map((account: Permission) => (  // ✅ FIXED: Use proper Permission type instead of any
-                  <Badge
-                    key={account.id}
-                    className="bg-slate-600 w-fit whitespace-nowrap"
-                  >
-                    Sub Account - {account.SubAccount.name}
-                  </Badge>
-                ))
-              ) : (
-                <div className="text-muted-foreground">No Access Yet</div>
-              )}
+              <Badge className="bg-slate-600 whitespace-nowrap">
+                Agency - {rowData.Agency?.name}
+              </Badge>
             </div>
           </div>
         )
-      },
+      return (
+        <div className="flex flex-col items-start">
+          <div className="flex flex-col gap-2">
+            {ownedAccounts?.length ? (
+              ownedAccounts.map((account) => (
+                <Badge
+                  key={account.id}
+                  className="bg-slate-600 w-fit whitespace-nowrap"
+                >
+                  Sub Account - {account.SubAccount.name}
+                </Badge>
+              ))
+            ) : (
+              <div className="text-muted-foreground">No Access Yet</div>
+            )}
+          </div>
+        </div>
+      )
     },
-    {
-      accessorKey: 'role',
-      header: 'Role',
-      cell: ({ row }) => {
-        const role: Role = row.getValue('role')
-        return (
-          <Badge
-            className={clsx({
-              'bg-emerald-500': role === 'AGENCY_OWNER',
-              'bg-orange-400': role === 'AGENCY_ADMIN',
-              'bg-primary': role === 'SUBACCOUNT_USER',
-              'bg-muted': role === 'SUBACCOUNT_GUEST',
-            })}
-          >
-            {role}
-          </Badge>
-        )
-      },
+  },
+  {
+    accessorKey: 'role',
+    header: 'Role',
+    cell: ({ row }) => {
+      const role: Role = row.getValue('role')
+      return (
+        <Badge
+          className={clsx({
+            'bg-emerald-500': role === 'AGENCY_OWNER',
+            'bg-orange-400': role === 'AGENCY_ADMIN',
+            'bg-primary': role === 'SUBACCOUNT_USER',
+            'bg-muted': role === 'SUBACCOUNT_GUEST',
+          })}
+        >
+          {role}
+        </Badge>
+      )
     },
-    {
-      id: 'actions',
-      cell: ({ row }) => {
-        const rowData = row.original
-
-        return <CellActions rowData={rowData} />
-      },
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) => {
+      const rowData = row.original
+      return <CellActions rowData={rowData} />
     },
-  ]
+  },
+]
 
 interface CellActionsProps {
-  rowData: UsersWithAgencySubAccountPermissionsSidebarOptions
+  rowData: TeamMemberData
 }
 
 const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
@@ -209,7 +212,6 @@ const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
                 </CustomModal>,
                 async () => {
                   const user = await getUser(rowData.id)
-                  // ✅ FIXED: Convert null to undefined for ModalData compatibility
                   return { user: user || undefined }
                 }
               )
