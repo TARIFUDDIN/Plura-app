@@ -1,7 +1,6 @@
 'use client';
 
 import React from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Badge, Trash } from "lucide-react";
 import {
@@ -23,7 +22,6 @@ interface EditorPaymentProps {
 }
 
 const EditorPayment: React.FC<EditorPaymentProps> = ({ element }) => {
-  const router = useRouter();
   const {
     state: editorState,
     dispatch,
@@ -94,9 +92,10 @@ subaccountId,
         if (data.error) throw new Error(data.error);
 
         if (data.clientSecret) setClientSecret(data.clientSecret);
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
         toast.error("Oppse!", {
-          description: error.message,
+          description: errorMessage,
           descriptionClassName: "line-clamp-3",
         });
       }
@@ -105,6 +104,7 @@ subaccountId,
 
     getClientSecret();
   }, [livePrices, subaccountId, subAccountConnectedId]);
+  
   const handleOnClickBody = (event: React.MouseEvent) => {
     event.stopPropagation();
 

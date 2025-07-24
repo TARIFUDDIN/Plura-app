@@ -12,9 +12,8 @@ import { buttonVariants } from "@/components/ui/button";
 import logoImage from "../../../../public/assets/plura-logo.svg";
 import { ModeToggle } from "@/components/global/mode.toggle";
 
-interface NavigationProps {}
-
-const Navigation: React.FC<NavigationProps> = async ({}) => {
+// Remove empty interface - use React.FC directly without props type
+const Navigation: React.FC = async () => {
   const user = await currentUser();
 
   return (

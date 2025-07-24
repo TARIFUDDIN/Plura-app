@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { db } from '@/lib/db'
 import { currentUser } from '@clerk/nextjs/server'
 import React from 'react'
-import { getAgencyDetails, getSubAccountDetails } from '@/lib/queries';
+import { getSubAccountDetails } from '@/lib/queries';
 import SubAccountDetails from '@/components/forms/SubAccountDetails';
 import UserDetails from '@/components/forms/UserDetails';
 

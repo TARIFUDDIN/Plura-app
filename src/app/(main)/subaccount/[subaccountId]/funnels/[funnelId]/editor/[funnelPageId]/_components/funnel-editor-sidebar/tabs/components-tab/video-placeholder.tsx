@@ -1,9 +1,7 @@
 import React from "react";
 import { Youtube } from "lucide-react";
 
-interface VideoPlaceholderProps {}
-
-const VideoPlaceholder: React.FC<VideoPlaceholderProps> = ({}) => {
+const VideoPlaceholder: React.FC = () => {
   const handleDragStart = (event: React.DragEvent) => {
     event.dataTransfer.setData("componentType", "video");
   };

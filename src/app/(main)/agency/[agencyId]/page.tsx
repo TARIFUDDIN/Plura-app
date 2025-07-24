@@ -28,13 +28,13 @@ const Page = async ({
   // Await params before using its properties
   const { agencyId } = await params
   
-  let currency = 'USD'
+  const currency = 'USD'
   let sessions
   let totalClosedSessions
   let totalPendingSessions
-  let net = 0
-  let potentialIncome = 0
-  let closingRate = 0
+  const net: number = 0
+  const potentialIncome: number = 0
+  const closingRate = 0
   const currentYear = new Date().getFullYear()
 
   const agencyDetails = await db.agency.findUnique({

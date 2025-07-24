@@ -90,7 +90,7 @@ const ContactFormComponent = (props: Props) => {
       });
 
       await goToNextPage();
-    } catch (error) {
+    } catch {
       toast.error("Failed", {
         description: "Could not save your information",
       });

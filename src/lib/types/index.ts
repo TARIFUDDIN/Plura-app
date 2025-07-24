@@ -8,7 +8,6 @@ import type {
     User,
   } from "@prisma/client";
 import type { _getTicketsWithAllRelations, getAuthUserDetails, getFunnels, getMedia, getPipelineDetails, getTicketsWithTags, getUserPermissions } from "../queries";
-import { db } from "../db";
 import { z } from 'zod'
 import Stripe from 'stripe'
 
@@ -20,25 +19,48 @@ export type UserWithPermissionsAndSubAccounts = Prisma.PromiseReturnType<
   typeof getUserPermissions
 >
 
-const __getUsersWithAgencySubAccountPermissionsSidebarOptions = async (
-  agencyId: string
-) => {
-  return await db.user.findFirst({
-    where: { Agency: { id: agencyId } },
-    include: {
-      Agency: { include: { SubAccount: true } },
-      Permissions: { include: { SubAccount: true } },
-    },
-  })
-}
+type __getUsersWithAgencySubAccountPermissionsSidebarOptions = () => Promise<{
+  id: string;
+  name: string;
+  avatarUrl: string;
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
+  role: any; 
+  agencyId: string | null;
+  Agency: {
+    id: string;
+    connectAccountId: string;
+    customerId: string;
+    name: string;
+    agencyLogo: string;
+    companyEmail: string;
+    companyPhone: string;
+    whiteLabel: boolean;
+    address: string;
+    city: string;
+    zipCode: string;
+    state: string;
+    country: string;
+    goal: number;
+    createdAt: Date;
+    updatedAt: Date;
+    SubAccount: any[]; // Define proper SubAccount type if needed
+  } | null;
+  Permissions: Array<{
+    id: string;
+    email: string;
+    subAccountId: string;
+    access: boolean;
+    SubAccount: any; // Define proper SubAccount type if needed
+  }>;
+} | null>
 
 export type AuthUserWithAgencySigebarOptionsSubAccounts =
   Prisma.PromiseReturnType<typeof getAuthUserDetails>
 
 export type UsersWithAgencySubAccountPermissionsSidebarOptions =
-  Prisma.PromiseReturnType<
-    typeof __getUsersWithAgencySubAccountPermissionsSidebarOptions
-  >
+  ReturnType<__getUsersWithAgencySubAccountPermissionsSidebarOptions>
 
 export type CreateMediaType = Prisma.MediaCreateWithoutSubaccountInput
 export type GetMediaFiles = Prisma.PromiseReturnType<typeof getMedia>

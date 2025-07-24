@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Tooltip,
   TooltipContent,
@@ -16,7 +16,6 @@ import clsx from 'clsx'
 import {
   ArrowLeftCircle,
   Eye,
-  EyeIcon,
   Laptop,
   Redo2,
   Smartphone,
@@ -109,7 +108,7 @@ const FunnelEditorNavigation = ({
       toast('Success', {
         description: 'Saved Editor',
       })
-    } catch (error) {
+    } catch {
       toast('Oppse!', {
         description: 'Could not save editor',
       })

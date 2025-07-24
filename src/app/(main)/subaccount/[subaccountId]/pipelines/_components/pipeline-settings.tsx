@@ -1,6 +1,5 @@
 'use client'
 import React from 'react'
-import PipelineInfobar from './pipeline-infobar'
 import { Pipeline } from '@prisma/client'
 import CreatePipelineForm from '@/components/forms/create-pipeline-form'
 import { Button } from '@/components/ui/button'
@@ -56,7 +55,7 @@ const PipelineSettings = ({
                       description: 'Pipeline is deleted',
                     })
                     router.replace(`/subaccount/${subaccountId}/pipelines`)
-                  } catch (error) {
+                  } catch {
                     toast({
                       variant: 'destructive',
                       title: 'Oppse!',

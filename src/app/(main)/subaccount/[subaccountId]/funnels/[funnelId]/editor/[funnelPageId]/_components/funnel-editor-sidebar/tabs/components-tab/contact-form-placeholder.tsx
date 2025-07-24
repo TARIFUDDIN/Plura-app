@@ -1,9 +1,7 @@
 import React from "react";
 import { Contact2 } from "lucide-react";
 
-interface ContactFormPlaceholderProps {}
-
-const ContactFormPlaceholder: React.FC<ContactFormPlaceholderProps> = ({}) => {
+const ContactFormPlaceholder: React.FC = () => {
   const handleDragStart = (event: React.DragEvent) => {
     event.dataTransfer.setData("componentType", "contactForm");
   };

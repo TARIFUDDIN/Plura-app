@@ -1,9 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { Plan, type Agency } from "@prisma/client";
-import { clerkClient } from "@clerk/nextjs/server";
-
+import { type Agency } from "@prisma/client";
 
 export const getAgencyDetails = async (agencyId: string) => {
   try {
@@ -51,7 +49,7 @@ export const deleteAgency = async (agencyId: string) => {
   return deletedUserFromDB;
 };
 
-export const upsertAgency = async (agency: Agency, price?: Plan) => {
+export const upsertAgency = async (agency: Agency) => {
   if (!agency.companyEmail) return null;
   try {
     const agencyDetails = await db.agency.upsert({
@@ -102,6 +100,7 @@ export const upsertAgency = async (agency: Agency, price?: Plan) => {
     });
 
     return agencyDetails;
-  } catch (error) {
+  } catch {
+    // Handle error silently or add appropriate error handling
   }
 };

@@ -1,9 +1,7 @@
 import { Columns2 } from "lucide-react";
 import React from "react";
 
-interface TwoColumnsPlaceholderProps {}
-
-const TwoColumnsPlaceholder: React.FC<TwoColumnsPlaceholderProps> = ({}) => {
+const TwoColumnsPlaceholder: React.FC = () => {
   const handleDragState = (e: React.DragEvent) => {
     e.dataTransfer.setData("componentType", '2Col');
   };

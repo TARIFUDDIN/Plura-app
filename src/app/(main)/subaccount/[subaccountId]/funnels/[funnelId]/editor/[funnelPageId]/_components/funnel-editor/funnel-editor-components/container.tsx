@@ -12,7 +12,7 @@ import { useEditor, type EditorElement } from '@/components/providers/editor/edi
 type Props = { element: EditorElement }
 
 const Container = ({ element }: Props) => {
-  const { id, content, name, styles, type } = element
+  const { id, content, styles, type } = element
   const { dispatch, state } = useEditor()
 
   const handleOnDrop = (e: React.DragEvent, type: string) => {

@@ -124,7 +124,7 @@ const PipelineLane: React.FC<PipelineLaneProps> = ({
       key={laneDetails?.id}
       isDragDisabled={false}
     >
-      {(provided, snapshot) => (
+      {(provided) => (
         <div
           {...provided.draggableProps}
           ref={provided.innerRef}

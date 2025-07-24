@@ -141,7 +141,7 @@ export default function TicketForm({ laneId, subaccountId, getNewTicket }: Props
       })
       if (response) getNewTicket(response)
       router.refresh()
-    } catch (error) {
+    } catch {
       toast({
         variant: 'destructive',
         title: 'Oppse!',
@@ -291,13 +291,13 @@ export default function TicketForm({ laneId, subaccountId, getNewTicket }: Props
                     className="h-9"
                     value={search}
                     onChangeCapture={async (value) => {
-                      //@ts-ignore
+                      // @ts-expect-error - event target value access
                       setSearch(value.target.value)
                       if (saveTimerRef.current)
                         clearTimeout(saveTimerRef.current)
                       saveTimerRef.current = setTimeout(async () => {
                         const response = await searchContacts(
-                          //@ts-ignore
+                          // @ts-expect-error - event target value access
                           value.target.value
                         )
                         setContactList(response)

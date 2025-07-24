@@ -5,7 +5,7 @@ import { AreaChart as AreaChartTremor } from "@tremor/react";
 
 interface AreaChartProps {
   className?: string;
-  data: any[];
+  data: Record<string, string | number>[];
   index: string;
   categories: string[];
   colors?: string[];

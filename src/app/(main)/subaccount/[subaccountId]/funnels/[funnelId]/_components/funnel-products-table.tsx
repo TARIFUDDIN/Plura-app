@@ -60,25 +60,28 @@ const FunnelProductsTable: React.FC<FunnelProductsTableProps> = ({
 
   const handleAddProduct = async (product: Stripe.Product) => {
     const productIdExists = liveProducts.find(
-      // @ts-ignore
+      // @ts-expect-error - Stripe type definitions may not include default_price
       (prod) => prod.productId === product.default_price?.id
     );
-    productIdExists
-      ? setLiveProducts(
-          liveProducts.filter(
-            // @ts-ignore
-            (prod) => prod.productId !== product.default_price?.id
-          )
+    
+    if (productIdExists) {
+      setLiveProducts(
+        liveProducts.filter(
+          // @ts-expect-error - Stripe type definitions may not include default_price
+          (prod) => prod.productId !== product.default_price?.id
         )
-      : setLiveProducts([
-          ...liveProducts,
-          {
-            //@ts-ignore
-            productId: product.default_price?.id as string,
-            //@ts-ignore
-            recurring: !!product.default_price.recurring,
-          },
-        ]);
+      );
+    } else {
+      setLiveProducts([
+        ...liveProducts,
+        {
+          // @ts-expect-error - Stripe type definitions may not include default_price
+          productId: product.default_price?.id as string,
+          // @ts-expect-error - Stripe type definitions may not include default_price
+          recurring: !!product.default_price.recurring,
+        },
+      ]);
+    }
   };
 
   return (
@@ -100,7 +103,7 @@ const FunnelProductsTable: React.FC<FunnelProductsTableProps> = ({
                 <Checkbox
                   defaultChecked={
                     !!liveProducts.find(
-                      //@ts-ignore
+                      // @ts-expect-error - Stripe type definitions may not include default_price
                       (prod) => prod.productId === product.default_price.id
                     )
                   }
@@ -120,13 +123,13 @@ const FunnelProductsTable: React.FC<FunnelProductsTableProps> = ({
               <TableCell>{product.name}</TableCell>
               <TableCell>
                 {
-                  //@ts-ignore
+                  // @ts-expect-error - Stripe type definitions may not include default_price
                   product.default_price?.recurring ? "Recurring" : "One Time"
                 }
               </TableCell>
               <TableCell className="text-right">
                 {
-                  //@ts-ignore
+                  // @ts-expect-error - Stripe type definitions may not include default_price
                   formatPrice(product.default_price?.unit_amount / 100)
                 }
               </TableCell>
@@ -136,7 +139,6 @@ const FunnelProductsTable: React.FC<FunnelProductsTableProps> = ({
       </Table>
       <Button
         disabled={isLoading}
-        
         onClick={handleSaveProducts}
         className="mt-4"
       >

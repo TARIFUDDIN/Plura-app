@@ -1,7 +1,6 @@
 import PipelineValue from '@/components/global/PipelineValue'
 import SubaccountFunnelChart from '@/components/global/SubaccountFunnelChart'
 import BlurPage from '@/components/common/BlurPage'
-import { Badge } from '@/components/ui/badge'
 import {
   Card,
   CardContent,
@@ -21,7 +20,7 @@ import {
 } from '@/components/ui/table'
 import { db } from '@/lib/db'
 import { AreaChart, BadgeDelta } from '@tremor/react'
-import { ClipboardIcon, Contact2, DollarSign, ShoppingCart } from 'lucide-react'
+import { Contact2, DollarSign, ShoppingCart } from 'lucide-react'
 import React from 'react'
 
 type Props = {
@@ -34,15 +33,14 @@ type Props = {
 const SubaccountPageId = async ({ params, searchParams }: Props) => {
   // Await params and searchParams before using their properties
   const { subaccountId } = await params
-  const resolvedSearchParams = await searchParams
+  await searchParams
   
-  let currency = 'USD'
+  const currency = 'USD'
   let sessions
   let totalClosedSessions
-  let totalPendingSessions
-  let net = 0
-  let potentialIncome = 0
-  let closingRate = 0
+  const net: number = 0
+  const potentialIncome: number = 0
+  const closingRate: number = 0
 
   const subaccountDetails = await db.subAccount.findUnique({
     where: {
@@ -51,8 +49,6 @@ const SubaccountPageId = async ({ params, searchParams }: Props) => {
   })
 
   const currentYear = new Date().getFullYear()
-  const startDate = new Date(`${currentYear}-01-01T00:00:00Z`).getTime() / 1000
-  const endDate = new Date(`${currentYear}-12-31T23:59:59Z`).getTime() / 1000
 
   if (!subaccountDetails) return
 
@@ -197,7 +193,6 @@ const SubaccountPageId = async ({ params, searchParams }: Props) => {
                     </TableRow>
                   </TableHeader>
                   <TableBody className="font-medium truncate">
-                    {/* Fixed: Wrap text in TableCell instead of direct text node */}
                     <TableRow>
                       <TableCell colSpan={4} className="text-center text-muted-foreground">
                         No Data

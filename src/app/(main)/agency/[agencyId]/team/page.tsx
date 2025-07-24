@@ -1,4 +1,3 @@
-import { db } from '@/lib/db'
 import React from 'react'
 import { redirect } from "next/navigation";
 import DataTable from './data-table'

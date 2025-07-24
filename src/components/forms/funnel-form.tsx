@@ -4,7 +4,6 @@ import { z } from 'zod'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -58,7 +57,7 @@ const FunnelForm: React.FC<CreateFunnelProps> = ({
         subDomainName: defaultData.subDomainName || '',
       })
     }
-  }, [defaultData])
+  }, [defaultData, form])
   const onSubmit = async (values: z.infer<typeof CreateFunnelFormSchema>) => {
     if (!subAccountId) return
     const response = await upsertFunnel(

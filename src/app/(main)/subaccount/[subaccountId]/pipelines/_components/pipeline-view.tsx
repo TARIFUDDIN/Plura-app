@@ -9,11 +9,11 @@ import {
   TicketAndTags,
 } from '@/lib/types'
 
-import { Lane, Ticket } from '@prisma/client'
+import { Lane } from '@prisma/client'
 import { Flag, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd'
+import { DragDropContext, Droppable, DropResult, DroppableProvided } from 'react-beautiful-dnd'
 import PipelineLane from './pipeline-lane'
 import { useModal } from '@/components/providers/ModalProvider'
 
@@ -26,8 +26,15 @@ type Props = {
   updateTicketsOrder: (tickets: TicketAndTags[]) => Promise<void>
 }
 
-// Fixed StrictModeDroppable Component
-const StrictModeDroppable = ({ children, droppableId, type, direction }: any) => {
+// StrictModeDroppable Component with proper typing
+type StrictModeDroppableProps = {
+  children: (provided: DroppableProvided) => React.ReactElement
+  droppableId: string
+  type: string
+  direction: 'horizontal' | 'vertical'
+}
+
+const StrictModeDroppable = ({ children, droppableId, type, direction }: StrictModeDroppableProps) => {
   const [enabled, setEnabled] = useState(false)
 
   useEffect(() => {
@@ -103,7 +110,7 @@ const PipelineView = ({
       }
 
       case 'ticket': {
-        let newLanes = [...allLanes]
+        const newLanes = [...allLanes]
         const originLane = newLanes.find(
           (lane) => lane.id === source.droppableId
         )
@@ -171,7 +178,7 @@ const PipelineView = ({
           type="lane"
           direction="horizontal"
         >
-          {(provided: any) => (
+          {(provided: DroppableProvided) => (
             <div
               className="flex items-center gap-x-2 overflow-scroll"
               {...provided.droppableProps}

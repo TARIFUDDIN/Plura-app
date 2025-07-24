@@ -12,7 +12,7 @@ type Props = {
 }
 
 const MediaUploadButton = ({ subaccountId }: Props) => {
-  const { isOpen, setOpen, setClose } = useModal()
+  const { setOpen } = useModal()
 
   return (
     <Button

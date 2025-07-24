@@ -1,9 +1,7 @@
 import React from "react";
 import { Box } from "lucide-react";
 
-interface ContainerPlaceholderProps {}
-
-const ContainerPlaceholder: React.FC<ContainerPlaceholderProps> = ({}) => {
+const ContainerPlaceholder: React.FC = () => {
   const handleDragStart = (event: React.DragEvent) => {
     event.dataTransfer.setData("componentType", "container");
   };

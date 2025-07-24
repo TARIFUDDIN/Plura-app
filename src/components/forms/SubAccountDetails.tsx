@@ -52,7 +52,6 @@ interface SubAccountDetailsProps {
 const SubAccountDetails: React.FC<SubAccountDetailsProps> = ({
   details,
   agencyDetails,
-  userId,
   userName,
 }) => {
   const router = useRouter();
@@ -90,6 +89,7 @@ const SubAccountDetails: React.FC<SubAccountDetailsProps> = ({
       setClose();
       router.refresh();
     } catch (error) {
+      console.error("Error saving subaccount details:", error);
       toast.error("Oppse!", {
         description: "Could not save sub account details.",
       });
@@ -100,7 +100,7 @@ const SubAccountDetails: React.FC<SubAccountDetailsProps> = ({
     if (details) {
       form.reset(details);
     }
-  }, [details]);
+  }, [details, form]);
 
   const isSubmitting = form.formState.isSubmitting;
 
@@ -259,7 +259,6 @@ const SubAccountDetails: React.FC<SubAccountDetailsProps> = ({
             />
             <Button
               type="submit"
-             
               disabled={isSubmitting}
             >
               Save Account Information

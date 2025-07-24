@@ -2,7 +2,7 @@
 
 import { Agency } from '@prisma/client'
 import { useForm } from 'react-hook-form'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { NumberInput } from '@tremor/react'
 import { v4 } from 'uuid'
 import { useRouter } from 'next/navigation'
@@ -71,8 +71,8 @@ const AgencyDetails = ({ data }: Props) => {
   const router = useRouter()
   const [deletingAgency, setDeletingAgency] = useState(false)
 
-  // Initialize form with default values
-  const defaultValues: z.infer<typeof FormSchema> = {
+  // Memoize default values to prevent unnecessary re-renders
+  const defaultValues: z.infer<typeof FormSchema> = useMemo(() => ({
     name: '',
     companyEmail: '',
     companyPhone: '',
@@ -83,7 +83,7 @@ const AgencyDetails = ({ data }: Props) => {
     state: '',
     country: '',
     agencyLogo: '',
-  }
+  }), [])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -108,11 +108,10 @@ const AgencyDetails = ({ data }: Props) => {
       }
       form.reset(formData)
     }
-  }, [data, form])
+  }, [data, form, defaultValues])
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      let newUserData;
       let custId;
       if (!data?.id) {
         const bodyData = {
@@ -170,11 +169,16 @@ try {
     description: "Could not create customer. Please check console for details.",
   });
   return;
-}}
-      newUserData = await initUser({ role: "AGENCY_OWNER" });
+}
+
+        // Initialize user only for new agencies
+        const newUserData = await initUser({ role: "AGENCY_OWNER" });
+        console.log('New user created:', newUserData);
+      }
+      
       if (!data?.customerId && !custId) return;
 
-      const response = await upsertAgency({
+      await upsertAgency({
         id: data?.id ? data.id : v4(),
         customerId: data?.customerId || custId || "",
         address: values.address,
@@ -192,13 +196,12 @@ try {
         connectAccountId: "",
         goal: 5,
       });
+      
       toast({
         title: "Created Agency",
       });
-      if (data?.id) return router.refresh();
-      if (response) {
-        return router.refresh();
-      }
+      
+      router.refresh();
     } catch (error) {
       console.log(error);
       toast({
@@ -208,11 +211,12 @@ try {
       });
     }
   };
+  
   const handleDeleteAgency = async () => {
     if (!data?.id) return
     try {
       setDeletingAgency(true)
-      const response = await deleteAgency(data.id)
+      await deleteAgency(data.id)
       toast({
         title: 'Deleted Agency',
         description: 'Deleted your agency and all subaccounts',

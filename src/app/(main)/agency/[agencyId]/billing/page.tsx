@@ -125,10 +125,8 @@ const Page = async ({ params }: Props) => {
             customerId={agencySubscription?.customerId || ''}
             key={addOn.id}
             amt={
-              //@ts-ignore
-              addOn.default_price?.unit_amount
-                ? //@ts-ignore
-                  `$${addOn.default_price.unit_amount / 100}`
+              (addOn.default_price as any)?.unit_amount
+                ? `$${(addOn.default_price as any).unit_amount / 100}`
                 : '$0'
             }
             buttonCta="Subscribe"

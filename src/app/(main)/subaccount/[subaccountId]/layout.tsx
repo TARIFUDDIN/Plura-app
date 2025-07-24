@@ -1,5 +1,4 @@
 import InfoBar from '@/components/common/infoBar'
-import Unauthorized from '@/components/common/Unauthorized'
 import Sidebar from '@/components/navigation/Sidebar'
 import {
   getAuthUserDetails,

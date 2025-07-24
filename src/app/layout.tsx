@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
 import { DM_Sans } from 'next/font/google'
 import './globals.css'
-import { ClerkProvider } from '@clerk/nextjs'
-import { dark } from '@clerk/themes'
 
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as SonnarToaster } from '@/components/ui/sonner'

@@ -1,4 +1,3 @@
-
 import { ModeToggle } from '@/components/global/mode.toggle'
 import { UserButton } from '@clerk/nextjs'
 import { User } from '@clerk/nextjs/server'
@@ -35,7 +34,7 @@ const Navigation = ({ user }: Props) => {
           href={'/agency'}
           className="bg-primary text-white p-2 px-4 rounded-md hover:bg-primary/80"
         >
-          Login
+          {user ? 'Dashboard' : 'Login'}
         </Link>
         <UserButton />
         <ModeToggle />

@@ -10,6 +10,9 @@ import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import React from 'react'
 
+// Import the existing type that InfoBar expects
+type NotificationsWithUser = Awaited<ReturnType<typeof getNotificationAndUser>>
+
 type Props = {
   children: React.ReactNode
   params: Promise<{ agencyId: string }>
@@ -36,7 +39,7 @@ const layout = async ({ children, params }: Props) => {
   )
     return <Unauthorized />
 
-  let allNoti: any = []
+  let allNoti: NotificationsWithUser = []
   const notifications = await getNotificationAndUser(agencyId)
   if (notifications) allNoti = notifications
 
@@ -49,7 +52,7 @@ const layout = async ({ children, params }: Props) => {
       <div className="md:pl-[300px]">
         <InfoBar
           notifications={allNoti}
-          role={allNoti.User?.role}
+          role={allNoti[0]?.User?.role}
         />
         <div className="relative">
           <BlurPage>{children}</BlurPage>

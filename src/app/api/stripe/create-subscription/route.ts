@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
       return NextResponse.json({
         subscriptionId: subscription.id,
-         //@ts-ignore
+        // @ts-expect-error - Stripe types don't include expanded payment_intent on latest_invoice
         clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
       })
     } else {
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
       return new NextResponse(
         JSON.stringify({
           subscriptionId: subscription.id,
-          //@ts-ignore
+          // @ts-expect-error - Stripe types don't include expanded payment_intent on latest_invoice
           clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
         }),
         { status: 200, headers }

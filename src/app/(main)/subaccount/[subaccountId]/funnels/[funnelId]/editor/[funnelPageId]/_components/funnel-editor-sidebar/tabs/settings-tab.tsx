@@ -1,5 +1,5 @@
 'use client'
-import React, { ChangeEventHandler } from 'react'
+import React from 'react'
 import {
   Accordion,
   AccordionContent,
@@ -32,14 +32,12 @@ import {
   GripHorizontal,
   Italic,
   LucideImageDown,
-  MousePointerClick,
   RemoveFormatting,
   Shrink,
   Type,
   Underline,
   Waves,
 } from "lucide-react";
-import { Tabs, TabsTrigger, TabsList } from '@/components/ui/tabs'
 import {
   Select,
   SelectContent,
@@ -54,14 +52,23 @@ import { Slider } from '@/components/ui/slider'
 import { SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { ColorPicker } from '@/components/ui/color-picker';
 
-type Props = {}
+interface Props {
+  // Add any props you need here, or leave empty if none are needed
+}
 
-const SettingsTab = (props: Props) => {
+interface StyleChangeEvent {
+  target: {
+    id: string;
+    value: string;
+  };
+}
+
+const SettingsTab: React.FC<Props> = () => {
   const { state, dispatch } = useEditor()
 
-  const handleOnChanges = (e: any) => {
+  const handleOnChanges = (e: StyleChangeEvent) => {
     const styleSettings = e.target.id
-    let value = e.target.value
+    const value = e.target.value
     const styleObject = {
       [styleSettings]: value,
     }
@@ -80,9 +87,9 @@ const SettingsTab = (props: Props) => {
     })
   }
 
-  const handleChangeCustomValues = (e: any) => {
+  const handleChangeCustomValues = (e: StyleChangeEvent) => {
     const settingProperty = e.target.id
-    let value = e.target.value
+    const value = e.target.value
     const styleObject = {
       [settingProperty]: value,
     }
@@ -121,26 +128,26 @@ const SettingsTab = (props: Props) => {
           "Layout",
         ]}
       >
-         <AccordionItem
-        value="Custom"
-        className="px-6 py-0  "
-      >
-        <AccordionTrigger className="!no-underline">Custom</AccordionTrigger>
-        <AccordionContent>
-          {state.editor.selectedElement.type === 'link' &&
-            !Array.isArray(state.editor.selectedElement.content) && (
-              <div className="flex flex-col gap-2">
-                <p className="text-muted-foreground">Link Path</p>
-                <Input
-                  id="href"
-                  placeholder="https:domain.example.com/pathname"
-                  onChange={handleChangeCustomValues}
-                  value={state.editor.selectedElement.content.href}
-                />
-              </div>
-            )}
-        </AccordionContent>
-      </AccordionItem>
+        <AccordionItem
+          value="Custom"
+          className="px-6 py-0"
+        >
+          <AccordionTrigger className="!no-underline">Custom</AccordionTrigger>
+          <AccordionContent>
+            {state.editor.selectedElement.type === 'link' &&
+              !Array.isArray(state.editor.selectedElement.content) && (
+                <div className="flex flex-col gap-2">
+                  <p className="text-muted-foreground">Link Path</p>
+                  <Input
+                    id="href"
+                    placeholder="https:domain.example.com/pathname"
+                    onChange={handleChangeCustomValues}
+                    value={state.editor.selectedElement.content.href}
+                  />
+                </div>
+              )}
+          </AccordionContent>
+        </AccordionItem>
 
         <AccordionItem value="Typography" className="px-6 py-0 border-y-[1px]">
           <AccordionTrigger className="!no-underline">

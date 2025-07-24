@@ -7,7 +7,7 @@ type AuthState = {
   isApiRoute?: boolean;
 }
 
-function beforeAuth(auth: AuthState, req: NextRequest): NextResponse | null {
+function beforeAuth(_auth: AuthState, _req: NextRequest): NextResponse | null {
   return null;
 }
 
@@ -15,7 +15,7 @@ async function afterAuth(auth: AuthState, req: NextRequest): Promise<NextRespons
   const url = new URL(req.url);
   const searchParams = url.searchParams.toString();
   const hostname = req.headers;
-  
+   
   const pathWithSearchParams = `${url.pathname}${
     searchParams.length > 0 ? `?${searchParams}` : ''
   }`;
@@ -61,7 +61,7 @@ async function afterAuth(auth: AuthState, req: NextRequest): Promise<NextRespons
     '/api/uploadthing',
     '/api/stripe'  // This will match all Stripe API routes
   ];
-  
+   
   if (!publicRoutes.some(route => url.pathname.startsWith(route))) {
     if (!auth.userId) {
       return NextResponse.redirect(new URL('/agency/sign-in', req.url));

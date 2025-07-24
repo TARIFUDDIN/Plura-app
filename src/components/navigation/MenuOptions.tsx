@@ -5,6 +5,8 @@ import {
   AgencySidebarOption,
   SubAccount,
   SubAccountSidebarOption,
+  User,
+  Role,
 } from '@prisma/client'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from '../ui/sheet'
@@ -23,7 +25,6 @@ import {
   CommandList,
 } from '../ui/command'
 import Link from 'next/link'
-import { twMerge } from 'tailwind-merge'
 import { useModal } from '@/components/providers/ModalProvider'
 import CustomModal from '../global/custom-modal'
 
@@ -32,20 +33,28 @@ import { Separator } from '../ui/separator'
 import SubAccountDetails from '../forms/SubAccountDetails'
 import { icons } from '../ui/icons'
 
+// Define proper types for the details and user props
+interface UserWithAgency extends User {
+  Agency?: Agency | null
+}
+
+interface DetailsType {
+  name: string
+  address: string
+}
 
 type Props = {
   defaultOpen?: boolean
   subAccounts: SubAccount[]
   sidebarOpt: AgencySidebarOption[] | SubAccountSidebarOption[]
   sidebarLogo: string
-  details: any
-  user: any
+  details: DetailsType
+  user: UserWithAgency
   id: string
 }
 
 const MenuOptions = ({
   details,
-  id,
   sidebarLogo,
   sidebarOpt,
   subAccounts,

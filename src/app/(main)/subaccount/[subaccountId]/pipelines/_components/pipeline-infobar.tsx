@@ -1,4 +1,3 @@
-
 "use client"
 import { useModal } from "@/components/providers/ModalProvider";
 import { Pipeline } from "@prisma/client";
@@ -7,7 +6,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
@@ -21,7 +19,6 @@ import Link from 'next/link'
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-
 import CustomModal from "@/components/global/custom-modal";
 import CreatePipelineForm from "@/components/forms/create-pipeline-form";
 
@@ -32,7 +29,7 @@ type Props = {
 }
 
 export default function PipelineInfoBar({ pipelineId, subaccountId, pipelines }: Props) {
-  const { setOpen: setOpenModal, setClose } = useModal();
+  const { setOpen: setOpenModal } = useModal();
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState(pipelineId)
 
@@ -48,7 +45,7 @@ export default function PipelineInfoBar({ pipelineId, subaccountId, pipelines }:
   }
 
   return (
-    < div >
+    <div>
       <div className="flex items-end gap-2">
         <Popover
           open={open}
@@ -109,6 +106,6 @@ export default function PipelineInfoBar({ pipelineId, subaccountId, pipelines }:
           </PopoverContent>
         </Popover>
       </div>
-    </div >
+    </div>
   )
 }

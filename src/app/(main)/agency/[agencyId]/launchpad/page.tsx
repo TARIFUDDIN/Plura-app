@@ -63,7 +63,7 @@ const LaunchPadPage = async ({ params, searchParams }: Props) => {
           data: { connectAccountId: response.stripe_user_id },
         })
         connectedStripeAccount = true
-      } catch (error) {
+      } catch {
         console.log('🔴 Could not connect stripe account')
       }
     }

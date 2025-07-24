@@ -1,9 +1,7 @@
 import Image from "next/image";
 import React from "react";
 
-interface PaymentFormPlaceholderProps {}
-
-const PaymentFormPlaceholder: React.FC<PaymentFormPlaceholderProps> = ({}) => {
+const PaymentFormPlaceholder: React.FC = () => {
   const handleDragStart = (event: React.DragEvent) => {
     event.dataTransfer.setData("componentType", "paymentForm");
   };

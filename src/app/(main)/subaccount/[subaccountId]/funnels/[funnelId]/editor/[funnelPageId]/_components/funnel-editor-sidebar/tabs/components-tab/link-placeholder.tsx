@@ -1,9 +1,7 @@
 import React from "react";
 import { Link2Icon } from "lucide-react";
 
-interface LinkPlaceholderProps {}
-
-const LinkPlaceholder: React.FC<LinkPlaceholderProps> = () => {
+const LinkPlaceholder: React.FC = () => {
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData("componentType", "link");
   };

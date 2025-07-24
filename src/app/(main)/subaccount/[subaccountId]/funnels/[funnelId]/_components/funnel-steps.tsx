@@ -36,8 +36,14 @@ type Props = {
   funnelId: string
 }
 
+interface StrictModeDroppableProps {
+  children: (provided: DroppableProvided) => React.ReactElement
+  droppableId: string
+  direction: 'vertical' | 'horizontal'
+}
+
 // StrictModeDroppable Component
-const StrictModeDroppable = ({ children, droppableId, direction }: any) => {
+const StrictModeDroppable = ({ children, droppableId, direction }: StrictModeDroppableProps) => {
   const [enabled, setEnabled] = useState(false)
 
   useEffect(() => {

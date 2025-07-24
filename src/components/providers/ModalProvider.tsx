@@ -24,14 +24,14 @@ export interface ModalData {
 type ModalContextType = {
   data: ModalData
   isOpen: boolean
-  setOpen: (modal: React.ReactNode, fetchData?: () => Promise<any>) => void
+  setOpen: (modal: React.ReactNode, fetchData?: () => Promise<ModalData>) => void
   setClose: () => void
 }
 
 export const ModalContext = createContext<ModalContextType>({
   data: {},
   isOpen: false,
-  setOpen: (modal: React.ReactNode, fetchData?: () => Promise<any>) => {},
+  setOpen: (modal: React.ReactNode, fetchData?: () => Promise<ModalData>) => {},
   setClose: () => {},
 })
 

@@ -1,9 +1,7 @@
 import { ImageIcon } from "lucide-react";
 import React from "react";
 
-interface ImagePlaceholderProps {}
-
-const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({}) => {
+const ImagePlaceholder: React.FC = () => {
   const handleDragStart = (event: React.DragEvent) => {
     event.dataTransfer.setData("componentType", "image");
   };

@@ -6,7 +6,6 @@ import { z } from 'zod'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -49,7 +48,7 @@ const ContactUserForm: React.FC<ContactUserFormProps> = ({ subaccountId }) => {
     if (data.contact) {
       form.reset(data.contact)
     }
-  }, [data, form.reset])
+  }, [data, form])
 
   const isLoading = form.formState.isLoading
 
@@ -74,6 +73,7 @@ const ContactUserForm: React.FC<ContactUserFormProps> = ({ subaccountId }) => {
       setClose()
       router.refresh()
     } catch (error) {
+      console.error('Error saving contact details:', error)
       toast({
         variant: 'destructive',
         title: 'Oppse!',

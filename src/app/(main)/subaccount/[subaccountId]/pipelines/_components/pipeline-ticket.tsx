@@ -1,5 +1,3 @@
-
-
 import TicketForm from '@/components/forms/ticket-form'
 import CustomModal from '@/components/global/custom-modal'
 import TagComponent from '@/components/global/tag'
@@ -56,10 +54,10 @@ type Props = {
 
 export default function PipelineTicket({ allTickets, index, setAllTickets, subaccountId, ticket }: Props) {
   const router = useRouter()
-  const { setOpen, data } = useModal()
+  const { setOpen } = useModal()
 
   const editNewTicket = (ticket: TicketWithTags[0]) => {
-    setAllTickets((tickets) =>
+    setAllTickets(() =>
       allTickets.map((t) => {
         if (t.id === ticket.id) {
           return ticket
@@ -120,11 +118,11 @@ export default function PipelineTicket({ allTickets, index, setAllTickets, subac
       {(provided, snapshot) => {
         if (snapshot.isDragging) {
           const offset = { x: 300, y: 20 }
-          //@ts-ignore
+          // @ts-expect-error - Accessing style properties that may be undefined
           const x = provided.draggableProps.style?.left - offset.x
-          //@ts-ignore
+          // @ts-expect-error - Accessing style properties that may be undefined
           const y = provided.draggableProps.style?.top - offset.y
-          //@ts-ignore
+          // @ts-expect-error - Modifying style object with calculated positions
           provided.draggableProps.style = {
             ...provided.draggableProps.style,
             top: y,

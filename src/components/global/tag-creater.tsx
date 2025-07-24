@@ -52,7 +52,7 @@ const TagCreator = ({ getSelectedTags, subAccountId, defaultTags }: Props) => {
 
   useEffect(() => {
     getSelectedTags(selectedTags)
-  }, [selectedTags])
+  }, [selectedTags, getSelectedTags])
 
   useEffect(() => {
     if (subAccountId) {
@@ -106,7 +106,7 @@ const TagCreator = ({ getSelectedTags, subAccountId, defaultTags }: Props) => {
         description: `Updated a tag | ${response?.name}`,
         subaccountId: subAccountId,
       })
-    } catch (error) {
+    } catch {
       toast({
         variant: 'destructive',
         title: 'Could not create tag',
@@ -135,7 +135,7 @@ const TagCreator = ({ getSelectedTags, subAccountId, defaultTags }: Props) => {
       })
 
       router.refresh()
-    } catch (error) {
+    } catch {
       toast({
         variant: 'destructive',
         title: 'Could not delete tag',

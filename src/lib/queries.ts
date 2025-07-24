@@ -11,7 +11,6 @@ import {
   Role,
   SubAccount,
   Tag,
-  Ticket,
   User,
 } from '@prisma/client'
 import { v4 } from 'uuid'
@@ -260,7 +259,7 @@ export const initUser = async (newUser: Partial<User>) => {
   return userData
 }
 
-export const upsertAgency = async (agency: Agency, price?: Plan) => {
+export const upsertAgency = async (agency: Agency) => {
   if (!agency.companyEmail) return null
   try {
     const agencyDetails = await db.agency.upsert({
@@ -704,7 +703,7 @@ export const createPipeline = async (subAccountId: string) => {
 
     return response;
   } catch (error) {
-    console.log()
+    console.log(error)
   }
 };
 export const updateTicketsOrder = async (tickets: Array<Pick<TicketAndTags, 'id' | 'order' | 'laneId'>>) => {

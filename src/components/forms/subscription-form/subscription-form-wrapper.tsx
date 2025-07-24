@@ -28,8 +28,6 @@ const SubscriptionFormWrapper = ({ customerId, planExists }: Props) => {
     subscriptionId: string
     clientSecret: string
   }>({ subscriptionId: '', clientSecret: '' })
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const options: StripeElementsOptions = useMemo(
     () => ({
@@ -44,8 +42,6 @@ const SubscriptionFormWrapper = ({ customerId, planExists }: Props) => {
   useEffect(() => {
     if (!selectedPriceId) return
     const createSecret = async () => {
-      setIsLoading(true)
-      setError(null)
       try {
         console.log('Making request to create subscription...');
         const response = await fetch('/api/stripe/create-subscription', {
@@ -92,14 +88,16 @@ const SubscriptionFormWrapper = ({ customerId, planExists }: Props) => {
         }
       } catch (err) {
         console.error('Subscription error:', err)
-        setError(err instanceof Error ? err.message : 'Failed to setup payment')
-      } finally {
-        setIsLoading(false)
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: err instanceof Error ? err.message : 'Failed to setup payment',
+        })
       }
     }
 
     createSecret()
-  }, [selectedPriceId, customerId])
+  }, [selectedPriceId, customerId, planExists, router, setClose])
 
   return (
     <div className="border-none transition-all">

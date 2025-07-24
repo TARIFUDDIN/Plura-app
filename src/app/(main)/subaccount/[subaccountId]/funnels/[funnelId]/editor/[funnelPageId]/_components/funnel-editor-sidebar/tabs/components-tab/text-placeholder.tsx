@@ -1,9 +1,7 @@
 import React from "react";
 import { TypeIcon } from "lucide-react";
 
-interface TextPlaceholderProps {}
-
-const TextPlaceholder: React.FC<TextPlaceholderProps> = (props) => {
+const TextPlaceholder: React.FC = () => {
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData("componentType", "text");
   };

@@ -1,4 +1,3 @@
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import React from 'react'
 import { useForm } from 'react-hook-form'
@@ -23,31 +22,32 @@ import { Button } from '../ui/button'
 import { ContactUserFormSchema } from '@/lib/types'
 import Loading from '../global/loading'
 
-
-type Props={
-    title: string,
-    subTitle: string,
-    apiCall:(values:z.infer<typeof ContactUserFormSchema>)=>any
+type Props = {
+  title: string,
+  subTitle: string,
+  apiCall: (values: z.infer<typeof ContactUserFormSchema>) => Promise<void> | void
 }
+
 const ContactForm = ({ apiCall, subTitle, title }: Props) => {
-    const form = useForm<z.infer<typeof ContactUserFormSchema>>({
-        mode: 'onChange',
-        resolver: zodResolver(ContactUserFormSchema),
-        defaultValues: {
-          name: '',
-          email: '',
-        },
-      })
-      const isLoading = form.formState.isLoading
+  const form = useForm<z.infer<typeof ContactUserFormSchema>>({
+    mode: 'onChange',
+    resolver: zodResolver(ContactUserFormSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+    },
+  })
+  
+  const isLoading = form.formState.isLoading
+  
   return (
     <Card className="max-w-[500px] w-[500px]">
-    <CardHeader>
-      <CardTitle>{title}</CardTitle>
-      <CardDescription>{subTitle}</CardDescription>
-    </CardHeader>
-    <CardContent>
-   
-    <Form {...form}>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{subTitle}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
           <form
             onSubmit={form.handleSubmit(apiCall)}
             className="flex flex-col gap-4"

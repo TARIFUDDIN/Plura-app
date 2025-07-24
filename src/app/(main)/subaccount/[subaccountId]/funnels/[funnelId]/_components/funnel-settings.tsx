@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Funnel, SubAccount } from '@prisma/client'
+import { Funnel } from '@prisma/client'
 import { db } from '@/lib/db'
 import { getConnectAccountProducts } from '@/lib/stripe/stripe-action'
 

@@ -1,7 +1,5 @@
-import { db } from '@/lib/db'
 import { createPipeline, getUserPipelines } from '@/lib/queries'
 import { redirect } from 'next/navigation'
-import React from 'react'
 
 type Props = {
   params: Promise<{ subaccountId: string }>
@@ -27,4 +25,5 @@ const Pipelines = async ({ params }: Props) => {
 
   redirect("/error");
 };
+
 export default Pipelines

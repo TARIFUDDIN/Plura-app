@@ -108,10 +108,10 @@ export async function POST(req: NextRequest) {
         },
       }
     );
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
     return NextResponse.json({
-        message: error.message
+        message: error instanceof Error ? error.message : "An unknown error occurred"
     }, { status: 400 });
   }
 }
