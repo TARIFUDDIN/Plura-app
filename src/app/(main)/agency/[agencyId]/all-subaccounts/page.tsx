@@ -43,7 +43,7 @@ const AllSubaccountsPage = async ({ params }: Props) => {
       <div className="flex flex-col">
         <CreateSubaccountButton
           user={user}
-          id={agencyId}
+          agencyId={agencyId} // Changed from id={agencyId} to agencyId={agencyId}
           className="w-[200px] self-end m-6"
         />
         <Command className="rounded-lg bg-transparent">
