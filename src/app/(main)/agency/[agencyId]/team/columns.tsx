@@ -79,9 +79,12 @@ export const columns: ColumnDef<UsersWithAgencySubAccountPermissionsSidebarOptio
       accessorKey: 'SubAccount',
       header: 'Owned Accounts',
       cell: ({ row }) => {
+        // ✅ FIXED: Add null check for row.original
+        if (!row.original) return null
+        
         const isAgencyOwner = row.getValue('role') === 'AGENCY_OWNER'
-        const ownedAccounts = row.original?.Permissions.filter(
-          (per) => per.access
+        const ownedAccounts = row.original.Permissions?.filter(
+          (per: any) => per.access
         )
 
         if (isAgencyOwner)
@@ -89,7 +92,7 @@ export const columns: ColumnDef<UsersWithAgencySubAccountPermissionsSidebarOptio
             <div className="flex flex-col items-start">
               <div className="flex flex-col gap-2">
                 <Badge className="bg-slate-600 whitespace-nowrap">
-                  Agency - {row?.original?.Agency?.name}
+                  Agency - {row.original.Agency?.name}
                 </Badge>
               </div>
             </div>
@@ -98,7 +101,7 @@ export const columns: ColumnDef<UsersWithAgencySubAccountPermissionsSidebarOptio
           <div className="flex flex-col items-start">
             <div className="flex flex-col gap-2">
               {ownedAccounts?.length ? (
-                ownedAccounts.map((account) => (
+                ownedAccounts.map((account: any) => (
                   <Badge
                     key={account.id}
                     className="bg-slate-600 w-fit whitespace-nowrap"
@@ -152,8 +155,9 @@ const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  if (!rowData) return
-  if (!rowData.Agency) return
+  
+  if (!rowData) return null
+  if (!rowData.Agency) return null
 
   return (
     <AlertDialog>
@@ -171,7 +175,7 @@ const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem
             className="flex gap-2"
-            onClick={() => navigator.clipboard.writeText(rowData?.email)}
+            onClick={() => navigator.clipboard.writeText(rowData.email)}
           >
             <Copy size={15} /> Copy Email
           </DropdownMenuItem>
@@ -186,12 +190,14 @@ const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
                 >
                   <UserDetails
                     type="agency"
-                    id={rowData?.Agency?.id || null}
-                    subAccounts={rowData?.Agency?.SubAccount}
+                    id={rowData.Agency?.id || null}
+                    subAccounts={rowData.Agency?.SubAccount}
                   />
                 </CustomModal>,
                 async () => {
-                  return { user: await getUser(rowData?.id) }
+                  const user = await getUser(rowData.id)
+                  // ✅ FIXED: Convert null to undefined for ModalData compatibility
+                  return { user: user || undefined }
                 }
               )
             }}

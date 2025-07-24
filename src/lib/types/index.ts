@@ -21,14 +21,15 @@ export type UserWithPermissionsAndSubAccounts = Prisma.PromiseReturnType<
   typeof getUserPermissions
 >
 
-type __getUsersWithAgencySubAccountPermissionsSidebarOptions = () => Promise<{
+// ✅ FIXED: Properly define the user type without Promise wrapper
+export type UsersWithAgencySubAccountPermissionsSidebarOptions = {
   id: string;
   name: string;
   avatarUrl: string;
   email: string;
   createdAt: Date;
   updatedAt: Date;
-  role: Role; // ✅ FIXED: Use proper Role type instead of any
+  role: Role;
   agencyId: string | null;
   Agency: {
     id: string;
@@ -47,22 +48,19 @@ type __getUsersWithAgencySubAccountPermissionsSidebarOptions = () => Promise<{
     goal: number;
     createdAt: Date;
     updatedAt: Date;
-    SubAccount: SubAccount[]; // ✅ FIXED: Use proper SubAccount type instead of any[]
+    SubAccount: SubAccount[];
   } | null;
   Permissions: Array<{
     id: string;
     email: string;
     subAccountId: string;
     access: boolean;
-    SubAccount: SubAccount; // ✅ FIXED: Use proper SubAccount type instead of any
+    SubAccount: SubAccount;
   }>;
-} | null>
+} | null
 
 export type AuthUserWithAgencySigebarOptionsSubAccounts =
   Prisma.PromiseReturnType<typeof getAuthUserDetails>
-
-export type UsersWithAgencySubAccountPermissionsSidebarOptions =
-  ReturnType<__getUsersWithAgencySubAccountPermissionsSidebarOptions>
 
 export type CreateMediaType = Prisma.MediaCreateWithoutSubaccountInput
 export type GetMediaFiles = Prisma.PromiseReturnType<typeof getMedia>
@@ -154,3 +152,17 @@ export const FunnelPageSchema = z.object({
   name: z.string().min(1),
   pathName: z.string().optional(),
 })
+
+// ✅ ADDED: ModalData type to fix the modal error
+export type ModalData = {
+  user?: {
+    id: string;
+    role: Role;
+    name: string;
+    avatarUrl: string;
+    email: string;
+    createdAt: Date;
+    updatedAt: Date;
+    agencyId: string | null;
+  } | undefined; // Keep as undefined to match expected type
+}
