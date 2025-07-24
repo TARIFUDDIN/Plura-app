@@ -6,6 +6,8 @@ import type {
     Tag,
     Ticket,
     User,
+    SubAccount,
+    Role,
   } from "@prisma/client";
 import type { _getTicketsWithAllRelations, getAuthUserDetails, getFunnels, getMedia, getPipelineDetails, getTicketsWithTags, getUserPermissions } from "../queries";
 import { z } from 'zod'
@@ -26,7 +28,7 @@ type __getUsersWithAgencySubAccountPermissionsSidebarOptions = () => Promise<{
   email: string;
   createdAt: Date;
   updatedAt: Date;
-  role: any; 
+  role: Role; // ✅ FIXED: Use proper Role type instead of any
   agencyId: string | null;
   Agency: {
     id: string;
@@ -45,14 +47,14 @@ type __getUsersWithAgencySubAccountPermissionsSidebarOptions = () => Promise<{
     goal: number;
     createdAt: Date;
     updatedAt: Date;
-    SubAccount: any[]; // Define proper SubAccount type if needed
+    SubAccount: SubAccount[]; // ✅ FIXED: Use proper SubAccount type instead of any[]
   } | null;
   Permissions: Array<{
     id: string;
     email: string;
     subAccountId: string;
     access: boolean;
-    SubAccount: any; // Define proper SubAccount type if needed
+    SubAccount: SubAccount; // ✅ FIXED: Use proper SubAccount type instead of any
   }>;
 } | null>
 

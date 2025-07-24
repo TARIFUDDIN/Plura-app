@@ -52,10 +52,6 @@ import { Slider } from '@/components/ui/slider'
 import { SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { ColorPicker } from '@/components/ui/color-picker';
 
-interface Props {
-  // Add any props you need here, or leave empty if none are needed
-}
-
 interface StyleChangeEvent {
   target: {
     id: string;
@@ -63,7 +59,7 @@ interface StyleChangeEvent {
   };
 }
 
-const SettingsTab: React.FC<Props> = () => {
+const SettingsTab: React.FC= () => {
   const { state, dispatch } = useEditor()
 
   const handleOnChanges = (e: StyleChangeEvent) => {

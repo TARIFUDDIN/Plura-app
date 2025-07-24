@@ -18,7 +18,7 @@ type Props = {
 const Page = async ({ params }: Props) => {
   // Await params before destructuring
   const { subaccountId, funnelId, funnelPageId } = await params;
-  
+   
   const funnelPageDetails = await db.funnelPage.findFirst({
     where: {
       id: funnelPageId,
@@ -46,7 +46,8 @@ const Page = async ({ params }: Props) => {
         <div className="h-full flex justify-center">
           <FunnelEditor funnelPageId={funnelPageId} />
         </div>
-        <FunnelEditorSidebar subaccountId={subaccountId} />
+        {/* Removed subaccountId prop since FunnelEditorSidebar doesn't accept it */}
+        <FunnelEditorSidebar />
       </EditorProvider>
     </div>
   )

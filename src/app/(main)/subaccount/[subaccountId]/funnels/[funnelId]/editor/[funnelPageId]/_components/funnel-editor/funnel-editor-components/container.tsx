@@ -15,7 +15,8 @@ const Container = ({ element }: Props) => {
   const { id, content, styles, type } = element
   const { dispatch, state } = useEditor()
 
-  const handleOnDrop = (e: React.DragEvent, type: string) => {
+  // Remove unused 'type' parameter from handleOnDrop
+  const handleOnDrop = (e: React.DragEvent) => {
     e.stopPropagation()
     const componentType = e.dataTransfer.getData('componentType') as EditorBtns
 
@@ -203,7 +204,7 @@ const Container = ({ element }: Props) => {
           state.editor.selectedElement.id === id && !state.editor.liveMode,
         'border-dashed border-[1px] border-slate-300': !state.editor.liveMode,
       })}
-      onDrop={(e) => handleOnDrop(e, id)}
+      onDrop={handleOnDrop}
       onDragOver={handleDragOver}
       draggable={type !== '__body'}
       onClick={handleOnClickBody}

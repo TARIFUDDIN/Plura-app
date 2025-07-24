@@ -1,12 +1,13 @@
 import React from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Database, Plus, SettingsIcon, SquareStackIcon } from 'lucide-react'
 
-type Props = {}
+// Remove unused Props type and use a more specific interface if needed
 
-const TabList = (props: Props) => {
+
+const TabList: React.FC = () => {
   return (
-    <TabsList className=" flex items-center flex-col justify-evenly w-full bg-transparent h-fit gap-4 ">
+    <TabsList className="flex items-center flex-col justify-evenly w-full bg-transparent h-fit gap-4">
       <TabsTrigger
         value="Settings"
         className="w-10 h-10 p-0 data-[state=active]:bg-muted"
@@ -19,7 +20,6 @@ const TabList = (props: Props) => {
       >
         <Plus />
       </TabsTrigger>
-
       <TabsTrigger
         value="Layers"
         className="w-10 h-10 p-0 data-[state=active]:bg-muted"

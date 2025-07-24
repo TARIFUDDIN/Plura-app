@@ -31,7 +31,7 @@ type ModalContextType = {
 export const ModalContext = createContext<ModalContextType>({
   data: {},
   isOpen: false,
-  setOpen: (modal: React.ReactNode, fetchData?: () => Promise<ModalData>) => {},
+  setOpen: () => {}, // ✅ FIXED: Removed unused parameters
   setClose: () => {},
 })
 

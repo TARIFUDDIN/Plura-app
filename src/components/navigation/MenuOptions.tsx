@@ -5,8 +5,7 @@ import {
   AgencySidebarOption,
   SubAccount,
   SubAccountSidebarOption,
-  User,
-  Role,
+  User
 } from '@prisma/client'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from '../ui/sheet'

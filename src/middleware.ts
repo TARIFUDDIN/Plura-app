@@ -8,6 +8,9 @@ type AuthState = {
 }
 
 function beforeAuth(_auth: AuthState, _req: NextRequest): NextResponse | null {
+  // Explicitly acknowledge unused parameters to satisfy ESLint
+  void _auth;
+  void _req;
   return null;
 }
 

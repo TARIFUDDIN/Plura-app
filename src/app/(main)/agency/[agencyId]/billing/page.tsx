@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/table'
 import clsx from 'clsx'
 import SubscriptionHelper from './_components/subscription-helper'
+import type Stripe from 'stripe'
 
 type Props = {
   params: Promise<{ agencyId: string }>
@@ -70,6 +71,12 @@ const Page = async ({ params }: Props) => {
     })),
   ];
 
+  // Helper function to get unit amount from price with proper typing
+  const getUnitAmount = (price: Stripe.Price | string | null | undefined): string => {
+    if (!price || typeof price === 'string') return '$0'
+    return price.unit_amount ? `${price.unit_amount / 100}` : '$0'
+  }
+
   return (
     <>
       <SubscriptionHelper
@@ -124,11 +131,7 @@ const Page = async ({ params }: Props) => {
             prices={prices.data}
             customerId={agencySubscription?.customerId || ''}
             key={addOn.id}
-            amt={
-              (addOn.default_price as any)?.unit_amount
-                ? `$${(addOn.default_price as any).unit_amount / 100}`
-                : '$0'
-            }
+            amt={getUnitAmount(addOn.default_price)}
             buttonCta="Subscribe"
             description="Dedicated support line & teams channel for support"
             duration="/ month"
