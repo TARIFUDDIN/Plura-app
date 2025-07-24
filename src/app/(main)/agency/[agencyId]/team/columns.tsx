@@ -37,6 +37,19 @@ import { useRouter } from 'next/navigation'
 import { UsersWithAgencySubAccountPermissionsSidebarOptions } from '@/lib/types'
 import CustomModal from '@/components/global/custom-modal'
 
+// Define the Permission type based on your Prisma schema
+type Permission = {
+  id: string
+  email: string
+  subAccountId: string
+  access: boolean
+  SubAccount: {
+    id: string
+    name: string
+    // Add other SubAccount properties as needed
+  }
+}
+
 export const columns: ColumnDef<UsersWithAgencySubAccountPermissionsSidebarOptions>[] =
   [
     {
@@ -84,7 +97,7 @@ export const columns: ColumnDef<UsersWithAgencySubAccountPermissionsSidebarOptio
         
         const isAgencyOwner = row.getValue('role') === 'AGENCY_OWNER'
         const ownedAccounts = row.original.Permissions?.filter(
-          (per: any) => per.access
+          (per: Permission) => per.access  // ✅ FIXED: Use proper Permission type instead of any
         )
 
         if (isAgencyOwner)
@@ -101,7 +114,7 @@ export const columns: ColumnDef<UsersWithAgencySubAccountPermissionsSidebarOptio
           <div className="flex flex-col items-start">
             <div className="flex flex-col gap-2">
               {ownedAccounts?.length ? (
-                ownedAccounts.map((account: any) => (
+                ownedAccounts.map((account: Permission) => (  // ✅ FIXED: Use proper Permission type instead of any
                   <Badge
                     key={account.id}
                     className="bg-slate-600 w-fit whitespace-nowrap"
