@@ -4,6 +4,7 @@ import CustomModal from '@/components/global/custom-modal'
 import { PricesList } from '@/lib/types'
 import { useModal } from '@/components/providers/ModalProvider'
 import { useSearchParams } from 'next/navigation'
+import { Plan } from '@prisma/client'
 import React, { useEffect } from 'react'
 
 type Props = {
@@ -31,7 +32,7 @@ const SubscriptionHelper = ({ customerId, planExists, prices }: Props) => {
         </CustomModal>,
         async () => ({
           plans: {
-            defaultPriceId: plan ? plan : '',
+            defaultPriceId: plan as Plan, // Cast to Plan type
             plans: prices,
           },
         })
