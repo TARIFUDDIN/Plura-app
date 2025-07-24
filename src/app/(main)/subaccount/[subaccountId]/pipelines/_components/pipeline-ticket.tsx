@@ -67,23 +67,25 @@ export default function PipelineTicket({ allTickets, index, setAllTickets, subac
     )
   }
 
-  const handleClickEdit = async () => {
-    setOpen(
-      <CustomModal
-        title="Update Ticket Details"
-        subheading=""
-      >
-        <TicketForm
-          getNewTicket={editNewTicket}
-          laneId={ticket.laneId}
-          subaccountId={subaccountId}
-        />
-      </CustomModal>,
-      async () => {
-        return { ticket: ticket }
-      }
-    )
-  }
+ // Replace your handleClickEdit function with this:
+
+const handleClickEdit = async () => {
+  setOpen(
+    <CustomModal
+      title="Update Ticket Details"
+      subheading=""
+    >
+      <TicketForm
+        getNewTicket={editNewTicket}
+        laneId={ticket.laneId}
+        subaccountId={subaccountId}
+      />
+    </CustomModal>,
+    async () => {
+      return { ticket: ticket } // No more type assertion needed
+    }
+  )
+}
 
   const handleDeleteTicket = async () => {
     try {

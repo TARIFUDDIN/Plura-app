@@ -763,7 +763,12 @@ export const getTicketsWithTags = async (pipelineId: string) => {
         pipelineId,
       },
     },
-    include: { Tags: true, Assigned: true, Customer: true },
+    include: { 
+      Tags: true, 
+      Assigned: true, 
+      Customer: true,
+      Lane: true // Add this line to include the Lane relation
+    },
   })
   
   return response.map(ticket => ({

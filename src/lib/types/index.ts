@@ -152,8 +152,6 @@ export const FunnelPageSchema = z.object({
   name: z.string().min(1),
   pathName: z.string().optional(),
 })
-
-// ✅ ADDED: ModalData type to fix the modal error
 export type ModalData = {
   user?: {
     id: string;
@@ -164,5 +162,6 @@ export type ModalData = {
     createdAt: Date;
     updatedAt: Date;
     agencyId: string | null;
-  } | undefined; // Keep as undefined to match expected type
+  };
+  ticket?: TicketWithTags[0]; // This will now include the Lane property
 }
