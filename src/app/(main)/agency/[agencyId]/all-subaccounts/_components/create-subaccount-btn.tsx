@@ -26,7 +26,6 @@ type Props = {
 const CreateSubaccountButton: React.FC<Props> = ({ 
   className = '',
   user,
-  agencyId
 }) => {
   const { setOpen } = useModal()
    
