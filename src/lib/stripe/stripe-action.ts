@@ -2,7 +2,9 @@ import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { Plan, Prisma } from "@prisma/client";
 import Stripe from "stripe";
-
+interface StripeSubscriptionExtended extends Stripe.Subscription {
+  current_period_end: number;
+}
 export const subscriptionCreate = async (
   subscription: Stripe.Subscription,
   customerId: string,
@@ -25,7 +27,7 @@ export const subscriptionCreate = async (
       active: subscription.status === "active",
       agencyId: agency.id,
       customerId,
-      currentPeriodEndDate: new Date((subscription as any).current_period_end * 1000),
+      currentPeriodEndDate: new Date((subscription as StripeSubscriptionExtended).current_period_end * 1000),
       priceId: subscription.items.data[0].price.id,
       subscriptionId: subscription.id,
       plan: subscription.items.data[0].price.id as Plan,
