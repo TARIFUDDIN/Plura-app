@@ -50,18 +50,7 @@ const PricingCard = ({
   const plan = searchParams.get('plan')
 
   const handleManagePlan = async () => {
-    // Convert the string plan to the Plan enum type
-    const getValidPlan = (planString: string | null): Plan => {
-      // Check if the plan string matches one of the enum values
-      if (planString === 'price_1RHr7JR8CMCKQcT941eHzkBh') {
-        return Plan.price_1RHr7JR8CMCKQcT941eHzkBh
-      }
-      if (planString === 'price_1RHr7JR8CMCKQcT9DSJh8PTr') {
-        return Plan.price_1RHr7JR8CMCKQcT9DSJh8PTr
-      }
-      // Default to the first plan if no match or null
-      return Plan.price_1RHr7JR8CMCKQcT941eHzkBh
-    }
+   
 
     // Alternative approach: find the plan from prices array
     const getValidPlanFromPrices = (): Plan => {
