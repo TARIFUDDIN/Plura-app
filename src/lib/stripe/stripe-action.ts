@@ -25,7 +25,7 @@ export const subscriptionCreate = async (
       active: subscription.status === "active",
       agencyId: agency.id,
       customerId,
-      currentPeriodEndDate: new Date(subscription.current_period_end * 1000),
+      currentPeriodEndDate: new Date((subscription as any).current_period_end * 1000),
       priceId: subscription.items.data[0].price.id,
       subscriptionId: subscription.id,
       plan: subscription.items.data[0].price.id as Plan,
