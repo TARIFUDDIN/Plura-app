@@ -1,10 +1,9 @@
+// lib/stripe/stripe-action.ts - Fixed type issues
 import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { Plan, Prisma } from "@prisma/client";
 import Stripe from "stripe";
-interface StripeSubscriptionExtended extends Stripe.Subscription {
-  current_period_end: number;
-}
+
 export const subscriptionCreate = async (
   subscription: Stripe.Subscription,
   customerId: string,
@@ -23,11 +22,16 @@ export const subscriptionCreate = async (
       throw new Error("Could not find an agency to upsert the subscription");
     }
 
+    // Type assertion to access current_period_end
+    const subscriptionWithPeriod = subscription as Stripe.Subscription & {
+      current_period_end: number;
+    };
+
     const data: Prisma.SubscriptionUncheckedCreateInput = {
       active: subscription.status === "active",
       agencyId: agency.id,
       customerId,
-      currentPeriodEndDate: new Date((subscription as StripeSubscriptionExtended).current_period_end * 1000),
+      currentPeriodEndDate: new Date(subscriptionWithPeriod.current_period_end * 1000),
       priceId: subscription.items.data[0].price.id,
       subscriptionId: subscription.id,
       plan: subscription.items.data[0].price.id as Plan,

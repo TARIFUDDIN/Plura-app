@@ -1,3 +1,4 @@
+// app/api/stripe/create-checkout-session/route.ts - Fixed route handler
 import { db } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { NextRequest, NextResponse } from "next/server";
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         {
-          error: "Subscription percent, onetime fee or agency percent is missing",
+          error: "Environment variables are missing",
         },
         {
           status: 400,
@@ -113,7 +114,7 @@ export async function POST(req: NextRequest) {
     console.log("Stripe checkout session error:", error);
     return NextResponse.json({
       message: error instanceof Error ? error.message : "An unknown error occurred"
-    }, { status: 500 }); // Changed to 500 for server errors
+    }, { status: 500 });
   }
 }
 
