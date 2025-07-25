@@ -1,25 +1,22 @@
 import React from "react";
 import { PlusCircle } from "lucide-react";
 
-import { getFunnels } from "@/lib/queries";
+import { getFunnels } from "@/queries/funnels";
 
-import FunnelForm from '@/components/forms/funnel-form'
+import FunnelDetails from "@/components/forms/FunnelDetails";
 import BlurPage from "@/components/common/BlurPage";
 import FunnelsDataTable from "./data-table";
 import { columns } from "./columns";
 import { constructMetadata } from "@/lib/utils";
 
 interface FunnelsPageProps {
-  params: Promise<{
+  params: {
     subaccountId: string;
-  }>;
+  };
 }
 
-const FunnelsPage: React.FC<FunnelsPageProps> = async ({ params }) => {
-  // Await params before using its properties
-  const { subaccountId } = await params;
-  
-  const funnels = await getFunnels(subaccountId);
+const FunnelsPageProps: React.FC<FunnelsPageProps> = async ({ params }) => {
+  const funnels = await getFunnels(params.subaccountId);
 
   if (!funnels) return null;
 
@@ -32,7 +29,7 @@ const FunnelsPage: React.FC<FunnelsPageProps> = async ({ params }) => {
             Create Funnel
           </>
         }
-        modalChildren={<FunnelForm subAccountId={subaccountId} />}
+        modalChildren={<FunnelDetails subAccountId={params.subaccountId} />}
         filterValue="name"
         columns={columns}
         data={funnels}
@@ -41,7 +38,7 @@ const FunnelsPage: React.FC<FunnelsPageProps> = async ({ params }) => {
   );
 };
 
-export default FunnelsPage;
+export default FunnelsPageProps;
 
 export const metadata = constructMetadata({
   title: "Funnels - Plura",

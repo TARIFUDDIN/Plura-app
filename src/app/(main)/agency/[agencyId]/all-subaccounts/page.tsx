@@ -1,15 +1,21 @@
-import { AlertDescription } from '@/components/ui/alert'
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { redirect } from "next/navigation";
+import { PlusCircle } from "lucide-react";
+
+import { getAuthUserDetails } from "@/queries/auth";
+
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
+  AlertDialogDescription,
+} from "@/components/ui/alert-dialog";
 import {
   Command,
   CommandEmpty,
@@ -17,108 +23,105 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command'
-import { getAuthUserDetails } from '@/lib/queries'
-import { SubAccount } from '@prisma/client'
-import Image from 'next/image'
-import Link from 'next/link'
+} from "@/components/ui/command";
+import { Button } from "@/components/ui/button";
+import DeleteButton from "./_components/DeleteButton";
+import CreateButton from "./_components/CreateButton";
+import { constructMetadata } from "@/lib/utils";
 
-import React from 'react'
-import DeleteButton from './_components/delete-button'
-import CreateSubaccountButton from './_components/create-subaccount-btn'
-
-type Props = {
-  params: Promise<{ agencyId: string }>
+interface AllSubAccountsPageProps {
+  params: {
+    agencyId: string | undefined;
+  };
 }
 
-const AllSubaccountsPage = async ({ params }: Props) => {
-  // Await params before using agencyId
-  const { agencyId } = await params
-  
-  const user = await getAuthUserDetails()
-  if (!user) return
+const AllSubAccountsPage: React.FC<AllSubAccountsPageProps> = async ({
+  params,
+}) => {
+  const { agencyId } = params;
+
+  const user = await getAuthUserDetails();
+
+  if (!agencyId) redirect("/agency/unauthorized");
+  if (!user) redirect("/agency/sign-in");
 
   return (
     <AlertDialog>
       <div className="flex flex-col">
-        <CreateSubaccountButton
-          user={user}
-          agencyId={agencyId} // Changed from id={agencyId} to agencyId={agencyId}
-          className="w-[200px] self-end m-6"
-        />
-        <Command className="rounded-lg bg-transparent">
-          <CommandInput placeholder="Search Account..." />
+        <div className="flex justify-center md:justify-start">
+          <CreateButton user={user} agencyId={agencyId} />
+        </div>
+        <Command className="bg-transparent">
+          <CommandInput placeholder="Search accounts..." />
           <CommandList>
-            <CommandEmpty>No Results Found.</CommandEmpty>
+            <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup heading="Sub Accounts">
-              {!!user.Agency?.SubAccount.length ? (
-                user.Agency.SubAccount.map((subaccount: SubAccount) => (
+              {!!user.agency?.subAccounts.length ? (
+                user.agency.subAccounts.map((subAccount) => (
                   <CommandItem
-                    key={subaccount.id}
-                    className="h-32 !bg-background my-2 text-primary border-[1px] border-border p-4 rounded-lg hover:!bg-background cursor-pointer transition-all"
+                    key={subAccount.id}
+                    className="h-32 bg-background my-2 text-primary border border-border p-4 cursor-pointer"
                   >
                     <Link
-                      href={`/subaccount/${subaccount.id}`}
+                      href={`/subaccount/${subAccount.id}`}
                       className="flex gap-4 w-full h-full"
                     >
-                      <div className="relative w-32">
+                      <div className="relative w-28 h-2w-28">
                         <Image
-                          src={subaccount.subAccountLogo}
-                          alt="subaccount logo"
+                          src={subAccount.subAccountLogo}
+                          alt="Subaccount logo"
                           fill
                           className="rounded-md object-contain bg-muted/50 p-4"
                         />
                       </div>
                       <div className="flex flex-col justify-between">
                         <div className="flex flex-col">
-                          {subaccount.name}
+                          {subAccount.name}
                           <span className="text-muted-foreground text-xs">
-                            {subaccount.address}
+                            {subAccount.address}
                           </span>
                         </div>
                       </div>
                     </Link>
                     <AlertDialogTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        className="w-20 hover:bg-red-600 hover:text-white !text-white"
-                      >
+                      <Button size="sm" variant="destructive" className="w-20">
                         Delete
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle className="text-left">
-                          Are your absolutely sure
+                          Are you absolutely sure?
                         </AlertDialogTitle>
-                        <AlertDescription className="text-left">
-                          This action cannot be undon. This will delete the
-                          subaccount and all data related to the subaccount.
-                        </AlertDescription>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently
+                          delete the subaccount and all data related to
+                          subaccount.
+                        </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter className="flex items-center">
-                        <AlertDialogCancel className="mb-2">
-                          Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction className="bg-destructive hover:bg-destructive">
-                          <DeleteButton subaccountId={subaccount.id} />
-                        </AlertDialogAction>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <DeleteButton subAccountId={subAccount.id} />
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </CommandItem>
                 ))
               ) : (
                 <div className="text-muted-foreground text-center p-4">
-                  No Sub accounts
+                  No subaccounts
                 </div>
               )}
             </CommandGroup>
+            <CommandItem></CommandItem>
           </CommandList>
         </Command>
       </div>
     </AlertDialog>
-  )
-}
+  );
+};
 
-export default AllSubaccountsPage
+export default AllSubAccountsPage;
+
+export const metadata = constructMetadata({
+  title: "Subaccounts - Plura",
+});

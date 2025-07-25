@@ -13,11 +13,6 @@ body {
   box-sizing: border-box;
 }
 
-/* 
-R (0)
-G (110)
-B (255 */
-
 @layer base {
   :root {
     --background: 216 100% 98.04%;
@@ -48,15 +43,10 @@ B (255 */
     --input: 0 0% 90.2%;
     --ring: 214.12 100% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 
   .dark {
-    /* Name: custom color palette
-       Author: Ilias Ism
-       URL: https://gradient.page */
-
-    /* CSS: .bg-gradient { background: var(--gradient) } */
     --gradient: linear-gradient(to top left, #007adf, #00ecbc);
 
     --background: 220 65% 3.52%;
@@ -71,7 +61,7 @@ B (255 */
     --card: 220 45% 5.72%;
     --card-foreground: 220 10% 97.2%;
 
-    --border: 220 50% 13.2%;
+    --border: 240 3.7% 15.9%;
     --input: 220 50% 13.2%;
 
     --primary: 220 100% 44%;
@@ -83,8 +73,8 @@ B (255 */
     --accent: 220 50% 13.2%;
     --accent-foreground: 220 10% 97.2%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 220 10% 97.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
     --ring: 220 100% 44%;
   }
@@ -99,13 +89,19 @@ B (255 */
   }
 }
 
+@layer utilities {
+  .scrollbar-medium::-webkit-scrollbar {
+    width: 6px;
+  }
+}
+
 .dotPattern {
   background-image: radial-gradient(rgb(35, 40, 68) 1px, transparent 1px);
   background-size: 25px 25px;
 }
 
 .use-automation-zoom-in {
-  animation: automation-zoom-in 0.5s;
+  animation: automation-zoom-in cubic-bezier(0.4, 0, 0.2, 1) 0.5s;
 }
 
 @keyframes automation-zoom-in {

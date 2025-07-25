@@ -1,13 +1,17 @@
-import { createPipeline, getUserPipelines } from '@/lib/queries'
-import { redirect } from 'next/navigation'
+import React from "react";
+import { redirect } from "next/navigation";
 
-type Props = {
-  params: Promise<{ subaccountId: string }>
+import { createPipeline, getUserPipelines } from "@/queries/pipelines";
+import { constructMetadata } from "@/lib/utils";
+
+interface PipelinesPageProps {
+  params: {
+    subaccountId: string | undefined;
+  };
 }
 
-const Pipelines = async ({ params }: Props) => {
-  // Await params before using its properties
-  const { subaccountId } = await params;
+const PipelinesPage: React.FC<PipelinesPageProps> = async ({ params }) => {
+  const { subaccountId } = params;
 
   if (!subaccountId) redirect("/subaccount/unauthorized");
 
@@ -25,5 +29,8 @@ const Pipelines = async ({ params }: Props) => {
 
   redirect("/error");
 };
+export default PipelinesPage;
 
-export default Pipelines
+export const metadata = constructMetadata({
+  title: "Pipelines - Plura",
+});

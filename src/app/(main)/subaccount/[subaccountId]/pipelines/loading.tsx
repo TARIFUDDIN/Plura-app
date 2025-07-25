@@ -1,6 +1,5 @@
-import Loading from "@/components/global/loading";
 import React from "react";
-
+import Loading from "@/components/ui/loading";
 
 const PipelinesLoading: React.FC = () => {
   return (

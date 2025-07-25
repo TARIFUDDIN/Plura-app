@@ -2,18 +2,17 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-import {  currentUser } from "@clerk/nextjs/server";
-
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, currentUser } from "@clerk/nextjs";
+import { ModeToggle } from "@/components/common/ModeToggle";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
 import logoImage from "../../../../public/assets/plura-logo.svg";
-import { ModeToggle } from "@/components/global/mode.toggle";
 
-// Remove empty interface - use React.FC directly without props type
-const Navigation: React.FC = async () => {
+interface NavigationProps {}
+
+const Navigation: React.FC<NavigationProps> = async ({}) => {
   const user = await currentUser();
 
   return (

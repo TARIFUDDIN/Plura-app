@@ -1,43 +1,33 @@
-// app/api/stripe/create-customer/route.ts
-import { stripe } from '@/lib/stripe'
-import { NextResponse } from 'next/server'
+import { stripe } from "@/lib/stripe";
+import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/utils";
+import type { StripeCustomer } from "@/lib/types";
 
-export const runtime = 'edge' // add this if you're using Next.js 13+
+export async function POST(req: NextRequest) {
+  const { email, address, name, shipping }: StripeCustomer = await req.json();
 
-export async function POST(req: Request) {
-  if (req.method !== 'POST') {
-    return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+  if (!email || !address || !name || !shipping) {
+    return NextResponse.json("Missing required fields", {
+      status: 400,
+    });
   }
 
   try {
-    const body = await req.json();
-    console.log('API received body:', body);
-
     const customer = await stripe.customers.create({
-      email: body.email,
-      name: body.name,
-      address: body.address,
-      shipping: body.shipping,
+      email,
+      name,
+      address,
+      shipping,
     });
 
-    console.log('Stripe customer created:', customer.id);
-
-    // Explicitly set the content type
-    return new NextResponse(
-      JSON.stringify({ customerId: customer.id }), 
-      { 
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
+    return NextResponse.json({
+      customerId: customer.id,
+    });
   } catch (error) {
-    console.error('API Error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    logger(error);
+
+    return NextResponse.json("Internal server error", {
+      status: 500,
+    });
   }
 }

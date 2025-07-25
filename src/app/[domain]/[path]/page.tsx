@@ -1,35 +1,42 @@
+import React from "react";
+import { notFound } from "next/navigation";
 
-import FunnelEditor from '@/app/(main)/subaccount/[subaccountId]/funnels/[funnelId]/editor/[funnelPageId]/_components/funnel-editor'
-import EditorProvider from '@/components/providers/editor/editor-provider'
-import { getDomainContent } from '@/lib/queries'
+import { getDomainContent } from "@/queries/domain";
+import EditorProvider from "@/components/providers/EditorProvider";
+import FunnelEditor from "@/components/modules/editor/FunnelEditor";
 
-import { notFound } from 'next/navigation'
-import React from 'react'
+interface DomainPathPageProps {
+  params: {
+    domain: string | undefined;
+    path: string | undefined;
+  };
+}
 
-const Page = async ({
-  params,
-}: {
-  params: { domain: string; path: string }
-}) => {
-  const domainData = await getDomainContent(params.domain.slice(0, -1))
-  const pageData = domainData?.FunnelPages.find(
+const DomainPathPage: React.FC<DomainPathPageProps> = async ({ params }) => {
+  const { domain, path } = params;
+
+  if (!domain || !path) notFound();
+
+  const domainData = await getDomainContent(domain.slice(0, -1));
+  const pageData = domainData?.funnelPages.find(
     (page) => page.pathName === params.path
-  )
+  );
 
-  if (!pageData || !domainData) return notFound()
+  if (!pageData || !domainData) notFound();
 
   return (
     <EditorProvider
-      subaccountId={domainData.subAccountId}
+      subAccountId={domainData.subAccountId}
       pageDetails={pageData}
       funnelId={domainData.id}
     >
       <FunnelEditor
+        funnelPageDetails={pageData}
         funnelPageId={pageData.id}
-        liveMode={true}
+        liveMode
       />
     </EditorProvider>
-  )
-}
+  );
+};
 
-export default Page
+export default DomainPathPage;

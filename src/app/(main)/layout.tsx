@@ -1,11 +1,8 @@
-import { ClerkProvider } from '@clerk/nextjs'
-import React from 'react'
-import { dark } from '@clerk/themes'
+import React from "react";
+import AuthProvider from "@/components/providers/AuthProvider";
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <ClerkProvider appearance={{ baseTheme: dark }}>{children}</ClerkProvider>
-  )
-}
+const MainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
+  return <AuthProvider>{children}</AuthProvider>;
+};
 
-export default Layout
+export default MainLayout;

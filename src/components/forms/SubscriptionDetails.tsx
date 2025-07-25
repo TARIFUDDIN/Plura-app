@@ -46,15 +46,13 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
       });
 
       if (error) {
-        console.error("Payment confirmation error:", error);
-        throw new Error(error.message || "Payment confirmation failed");
+        throw new Error();
       }
 
       toast.success("Payment successfull!", {
         description: "Your payment has been successfully processed.",
       });
     } catch (error) {
-      console.error("Payment error:", error);
       toast.error("Payment failed", {
         description:
           "We could not process your payment. Please try a different card.",

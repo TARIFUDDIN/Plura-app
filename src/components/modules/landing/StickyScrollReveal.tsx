@@ -31,7 +31,7 @@ const content = [
     content: (
       <div className="h-full w-full rounded-md flex items-center justify-center text-white">
         <Image
-          src="https://utfs.io/f/30845fe9-f07d-49a4-8072-112bb8152111-euyk0.png"
+          src="https://utfs.io/f/W6d10L2y3amd8OONx03LQkvJwVTh2nqIPHMZW8sUDbOiYAEe"
           fill
           className="h-full w-full object-fit rounded-md border"
           alt="Feature"
@@ -141,7 +141,7 @@ export const StickyScroll = ({
   contentClassName?: string | React.ReactNode;
 }) => {
   const [activeCard, setActiveCard] = React.useState(0);
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<any>(null);
   const { scrollYProgress } = useScroll({
     // uncomment line 22 and comment line 23 if you DONT want the overflow container and want to have it change on the entire page scroll
     target: ref,
@@ -185,8 +185,7 @@ export const StickyScroll = ({
               >
                 {item.title}
               </motion.h2>
-              {/* Changed from motion.p to motion.div to fix nested p tag issue */}
-              <motion.div
+              <motion.p
                 initial={{
                   opacity: 0,
                 }}
@@ -196,7 +195,7 @@ export const StickyScroll = ({
                 className="max-w-md mt-4 space-y-2"
               >
                 {item.description}
-              </motion.div>
+              </motion.p>
             </div>
           ))}
           <div className="h-40" />

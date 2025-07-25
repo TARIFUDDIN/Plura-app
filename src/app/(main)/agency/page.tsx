@@ -1,53 +1,74 @@
-import Unauthorized from '@/components/common/Unauthorized'
-import AgencyDetails from '@/components/forms/AgencyDetails'
-import { getAuthUserDetails, verifyAndAcceptInvitation } from '@/lib/queries'
-import { currentUser } from '@clerk/nextjs/server'
-import { Plan } from '@prisma/client'
-import { redirect } from 'next/navigation'
-import React from 'react'
+import React from "react";
 
-const Page = async ({
-  searchParams,
-}: {
-  searchParams: Promise<{ plan: Plan; state: string; code: string }>
-}) => {
-  // Await searchParams before using its properties
-  const resolvedSearchParams = await searchParams
-  
-  const agencyId = await verifyAndAcceptInvitation()
-  console.log(agencyId)
-  
-  const user = await getAuthUserDetails()
+import { currentUser } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
+import { type Plan, Role } from "@prisma/client";
+
+import { getAuthUserDetails } from "@/queries/auth";
+import { verifyInvintation } from "@/queries/invintations";
+
+import AgencyDetails from "@/components/forms/AgencyDetails";
+import Unauthorized from "@/components/common/Unauthorized";
+import { constructMetadata } from "@/lib/utils";
+
+interface AgencyPageProps {
+  searchParams: {
+    plan: Plan | undefined;
+    state: string | undefined;
+    code: string | undefined;
+  };
+}
+
+const AgencyPage: React.FC<AgencyPageProps> = async ({ searchParams }) => {
+  const authUser = await currentUser();
+
+  const agencyId = await verifyInvintation();
+  const user = await getAuthUserDetails();
+
+  const isSubAccountUser =
+    user?.role === Role.SUBACCOUNT_GUEST || user?.role === Role.SUBACCOUNT_USER;
+  const isAgencyUser =
+    user?.role === Role.AGENCY_OWNER || user?.role === Role.AGENCY_ADMIN;
+
   if (agencyId) {
-    if (user?.role === 'SUBACCOUNT_GUEST' || user?.role === 'SUBACCOUNT_USER') {
-      return redirect('/subaccount')
-    } else if (user?.role === 'AGENCY_OWNER' || user?.role === 'AGENCY_ADMIN') {
-      if (resolvedSearchParams.plan) {
-        return redirect(`/agency/${agencyId}/billing?plan=${resolvedSearchParams.plan}`)
+    if (isSubAccountUser) {
+      redirect("/subaccount");
+    } else if (isAgencyUser) {
+      if (searchParams.plan) {
+        redirect(`/agency/${agencyId}/billing?plan=${searchParams.plan}`);
       }
-      if (resolvedSearchParams.state) {
-        const statePath = resolvedSearchParams.state.split('___')[0]
-        const stateAgencyId = resolvedSearchParams.state.split('___')[1]
-        if (!stateAgencyId) return <div>Not authorized</div>
-        return redirect(
-          `/agency/${stateAgencyId}/${statePath}?code=${resolvedSearchParams.code}`
-        )
-      } else return redirect(`/agency/${agencyId}`)
-    } else {
-      return <Unauthorized/>
+
+      if (searchParams.state) {
+        const statePath = searchParams.state.split("___")[0];
+        const stateAgencyId = searchParams.state.split("___")[1];
+
+        if (!stateAgencyId) return <div>Not authorized.</div>;
+
+        redirect(
+          `/agency/${stateAgencyId}/${statePath}?code=${searchParams.code}`
+        );
+      }
+
+      redirect(`/agency/${agencyId}`);
     }
+
+    return <Unauthorized />;
   }
-  const authUser = await currentUser()
+
   return (
     <div className="flex justify-center items-center mt-4">
-      <div className="max-w-[850px] border-[1px] p-4 rounded-xl">
-        <h1 className="text-4xl"> Create An Agency</h1>
+      <div className="max-w-[850px] flex flex-col gap-8">
+        {/* <h1 className="text-4xl">Create An Agency</h1> */}
         <AgencyDetails
-          data={{ companyEmail: authUser?.emailAddresses[0].emailAddress }}
+          data={{ companyEmail: authUser!.emailAddresses[0].emailAddress }}
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Page
+export default AgencyPage;
+
+export const metadata = constructMetadata({
+  title: "Agency - Plura",
+});

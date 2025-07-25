@@ -1,7 +1,9 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { type Agency } from "@prisma/client";
+import { Plan, type Agency } from "@prisma/client";
+import { clerkClient } from "@clerk/nextjs";
+import { logger } from "@/lib/utils";
 
 export const getAgencyDetails = async (agencyId: string) => {
   try {
@@ -10,7 +12,7 @@ export const getAgencyDetails = async (agencyId: string) => {
         id: agencyId,
       },
       include: {
-        SubAccount: true,
+        subAccounts: true,
       },
     });
 
@@ -18,7 +20,7 @@ export const getAgencyDetails = async (agencyId: string) => {
 
     return agencyDetails;
   } catch (error) {
-    console.log(error);
+    logger(error);
   }
 };
 
@@ -42,14 +44,14 @@ export const deleteAgency = async (agencyId: string) => {
       id: agencyId,
     },
     include: {
-      SubAccount: true,
+      subAccounts: true,
     },
   });
 
   return deletedUserFromDB;
 };
 
-export const upsertAgency = async (agency: Agency) => {
+export const upsertAgency = async (agency: Agency, price?: Plan) => {
   if (!agency.companyEmail) return null;
   try {
     const agencyDetails = await db.agency.upsert({
@@ -62,7 +64,7 @@ export const upsertAgency = async (agency: Agency) => {
           connect: { email: agency.companyEmail },
         },
         ...agency,
-        SidebarOption: {
+        sidebarOptions: {
           create: [
             {
               name: "Dashboard",
@@ -100,7 +102,36 @@ export const upsertAgency = async (agency: Agency) => {
     });
 
     return agencyDetails;
-  } catch {
-    // Handle error silently or add appropriate error handling
+  } catch (error) {
   }
+};
+
+export const getAgencySubscription = async (agencyId: string) => {
+  const agencySubscription = await db.agency.findUnique({
+    where: {
+      id: agencyId,
+    },
+    select: {
+      customerId: true,
+      subscriptions: true,
+    },
+  });
+
+  return agencySubscription;
+};
+
+export const updateAgencyConnectedId = async (
+  agencyId: string,
+  connectAccountId: string
+) => {
+  const response = await db.agency.update({
+    where: {
+      id: agencyId,
+    },
+    data: {
+      connectAccountId,
+    },
+  });
+
+  return response;
 };

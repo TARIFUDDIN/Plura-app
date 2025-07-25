@@ -4,7 +4,9 @@ import { buttonVariants } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 
-const Unauthorized: React.FC = () => (
+interface UnauthorizedProps {}
+
+const Unauthorized: React.FC<UnauthorizedProps> = ({}) => (
   <div className="p-4 text-center h-screen w-screen flex justify-center items-center flex-col">
     <h1 className="text-3xl md:text-4xl font-medium">Unauthorized acccess!</h1>
     <p className="mt-2">

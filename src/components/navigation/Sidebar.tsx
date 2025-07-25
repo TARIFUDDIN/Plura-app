@@ -1,71 +1,82 @@
-import { getAuthUserDetails } from '@/lib/queries'
-import React from 'react'
-import MenuOptions from './MenuOptions'
+import React from "react";
+import {
+  type AgencySidebarOption,
+  type SubAccountSidebarOption,
+} from "@prisma/client";
 
+import { getAuthUserDetails } from "@/queries/auth";
 
-type Props = {
-  id: string
-  type: 'agency' | 'subaccount'
+import MenuOptions from "./MenuOptions";
+
+interface SidebarProps {
+  id: string;
+  type: "agency" | "subaccount";
 }
 
-const Sidebar = async ({ id, type }: Props) => {
-  const user = await getAuthUserDetails()
-  if (!user) return null
+const Sidebar: React.FC<SidebarProps> = async ({ id, type }) => {
+  const user = await getAuthUserDetails();
 
-  if (!user.Agency) return
+  if (!user || !user.agency) return null;
 
   const details =
-    type === 'agency'
-      ? user?.Agency
-      : user?.Agency.SubAccount.find((subaccount) => subaccount.id === id)
+    type === "agency"
+      ? user.agency
+      : user?.agency.subAccounts.find((subAccount) => subAccount.id === id);
+  const isWhiteLabelAgency = user.agency.whiteLabel;
 
-  const isWhiteLabeledAgency = user.Agency.whiteLabel
-  if (!details) return
+  if (!details) return null;
 
-  let sideBarLogo = user.Agency.agencyLogo || '/assets/plura-logo.svg'
+  let sideBarLogo: string = user.agency.agencyLogo || "/assets/plura-logo.svg";
 
-  if (!isWhiteLabeledAgency) {
-    if (type === 'subaccount') {
-      sideBarLogo =
-        user?.Agency.SubAccount.find((subaccount) => subaccount.id === id)
-          ?.subAccountLogo || user.Agency.agencyLogo
-    }
+  if (!isWhiteLabelAgency && type === "subaccount") {
+    const subAccountLogo = user?.agency.subAccounts.find(
+      (subAccount) => subAccount.id === id
+    )?.subAccountLogo;
+
+    sideBarLogo = subAccountLogo || user.agency.agencyLogo;
   }
 
-  const sidebarOpt =
-    type === 'agency'
-      ? user.Agency.SidebarOption || []
-      : user.Agency.SubAccount.find((subaccount) => subaccount.id === id)
-          ?.SidebarOption || []
+  let sidebarOptions: AgencySidebarOption[] | SubAccountSidebarOption[] = [];
 
-  const subaccounts = user.Agency.SubAccount.filter((subaccount) =>
-    user.Permissions.find(
+  if (type === "agency") {
+    sidebarOptions = user.agency.sidebarOptions || [];
+  } else {
+    const subAccount = user.agency.subAccounts.find(
+      (subaccount) => subaccount.id === id
+    );
+
+    sidebarOptions = subAccount?.sidebarOptions || [];
+  }
+
+  const subAccounts = user.agency.subAccounts.filter((subAccount) =>
+    user.permissions.find(
       (permission) =>
-        permission.subAccountId === subaccount.id && permission.access
+        permission.subAccountId === subAccount.id && permission.access === true
     )
-  )
+  );
 
   return (
     <>
       <MenuOptions
-        defaultOpen={true}
+        defaultOpen
         details={details}
         id={id}
-        sidebarLogo={sideBarLogo}
-        sidebarOpt={sidebarOpt}
-        subAccounts={subaccounts}
+        sideBarLogo={sideBarLogo}
+        sideBarOptions={sidebarOptions}
+        subAccount={subAccounts}
         user={user}
       />
       <MenuOptions
+        defaultOpen={false}
         details={details}
         id={id}
-        sidebarLogo={sideBarLogo}
-        sidebarOpt={sidebarOpt}
-        subAccounts={subaccounts}
+        sideBarLogo={sideBarLogo}
+        sideBarOptions={sidebarOptions}
+        subAccount={subAccounts}
         user={user}
       />
     </>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;

@@ -1,68 +1,79 @@
-// page.tsx
-import BlurPage from '@/components/common/BlurPage'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { getFunnel } from '@/lib/queries'
-import Link from 'next/link'
-import { redirect } from 'next/navigation'
-import React from 'react'
-import FunnelSteps from './_components/funnel-steps'
-import FunnelSettings from './_components/funnel-settings'
-import { constructMetadata } from '@/lib/utils'
+import React from "react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
-type Props = {
-  params: Promise<{
-    funnelId: string
-    subaccountId: string
-  }>
+import { getFunnel } from "@/queries/funnels";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import BlurPage from "@/components/common/BlurPage";
+import FunnelSettings from "@/components/modules/funnels/FunnelSettings";
+import FunnelSteps from "@/components/modules/funnels/FunnelSteps";
+
+import { cn, constructMetadata } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { FunnelsForSubAccount } from "@/lib/types";
+
+interface FunnelIdPageProps {
+  params: {
+    funnelId: string | undefined;
+    subaccountId: string | undefined;
+  };
 }
 
-const FunnelPage = async ({ params }: Props) => {
-  // Await params before destructuring
-  const { funnelId, subaccountId } = await params
-  
-  const funnelPages = await getFunnel(funnelId)
+const FunnelIdPage: React.FC<FunnelIdPageProps> = async ({ params }) => {
+  const { funnelId, subaccountId } = params;
 
-  if (!funnelPages)
-    return redirect(`/subaccount/${subaccountId}/funnels`)
+  if (!subaccountId) redirect("/subaccount/unauthorized");
+  if (!funnelId) redirect(`/subaccount/${subaccountId}/funnels`);
+
+  const funnelPages = await getFunnel(funnelId);
+
+  if (!funnelPages) redirect(`/subaccount/${subaccountId}/funnels`);
 
   return (
     <BlurPage>
       <Link
         href={`/subaccount/${subaccountId}/funnels`}
-        className="flex justify-between gap-4 mb-4 text-muted-foreground"
+        className={cn(
+          buttonVariants({ variant: "secondary" }),
+          "mb-4 inline-flex items-center gap-2"
+        )}
       >
+        <ArrowLeft className="w-4 h-4" />
         Back
       </Link>
-      <h1 className="text-3xl mb-8">{funnelPages.name}</h1>
-      <Tabs
-        defaultValue="steps"
-        className="w-full"
-      >
-        <TabsList className="grid grid-cols-2 w-[50%] bg-transparent">
-          <TabsTrigger value="steps">Steps</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+      <Tabs defaultValue="steps" className="w-full">
+        <TabsList className="bg-transparent border-b border-border rounded-none sm:flex-row flex-col gap-4 sm:gap-0 sm:h-16 h-auto w-full sm:justify-between mb-4 pb-4 sm:pb-0">
+          <h1 className="text-3xl font-bold mb-4 text-secondary-foreground">
+            {funnelPages.name}
+          </h1>
+          <div className="flex items-center w-full sm:w-auto">
+            <TabsTrigger value="steps">Steps</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </div>
         </TabsList>
         <TabsContent value="steps">
           <FunnelSteps
             funnel={funnelPages}
-            subaccountId={subaccountId}
-            pages={funnelPages.FunnelPages}
+            subAccountId={subaccountId}
+            initialPages={funnelPages.funnelPages}
             funnelId={funnelId}
           />
         </TabsContent>
         <TabsContent value="settings">
           <FunnelSettings
-            subaccountId={subaccountId}
+            subAccountId={subaccountId}
             defaultData={funnelPages}
           />
         </TabsContent>
       </Tabs>
     </BlurPage>
-  )
-}
+  );
+};
 
-export default FunnelPage
+export default FunnelIdPage;
 
 export const metadata = constructMetadata({
   title: "Funnel - Plura",
-})
+});

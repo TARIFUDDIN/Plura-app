@@ -13,7 +13,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-export const ModeToggle: React.FC<React.HTMLAttributes<HTMLButtonElement>> = ({
+interface ModeToggleProps extends React.HTMLAttributes<HTMLButtonElement> {}
+
+export const ModeToggle: React.FC<ModeToggleProps> = ({
   className,
   ...props
 }) => {

@@ -1,31 +1,30 @@
-import InfoBar from '@/components/common/infoBar'
-import Sidebar from '@/components/navigation/Sidebar'
-import {
-  getAuthUserDetails,
-  getNotificationAndUser,
-  verifyAndAcceptInvitation,
-} from '@/lib/queries'
-import type { NotificationsWithUser } from '@/lib/types'
-import { currentUser } from '@clerk/nextjs/server'
-import { Role } from '@prisma/client'
-import { redirect } from 'next/navigation'
-import React from 'react'
+import React from "react";
+import { redirect } from "next/navigation";
+import { currentUser } from "@clerk/nextjs";
+import { Role } from "@prisma/client";
+
+import { verifyInvintation } from "@/queries/invintations";
+import { getAuthUserDetails } from "@/queries/auth";
+import { getNotification } from "@/queries/notifications";
+
+import Sidebar from "@/components/navigation/Sidebar";
+import InfoBar from "@/components/common/InfoBar";
+
+import { NotificationsWithUser } from "@/lib/types";
 
 interface SubAccountIdLayoutProps {
   children: React.ReactNode;
-  params: Promise<{
+  params: {
     subaccountId: string | undefined;
-  }>;
+  };
 }
 
 const SubAccountIdLayout: React.FC<SubAccountIdLayoutProps> = async ({
   children,
   params,
 }) => {
-  // Await params before using its properties
-  const { subaccountId } = await params;
-  
-  const agencyId = await verifyAndAcceptInvitation();
+  const { subaccountId } = params;
+  const agencyId = await verifyInvintation();
 
   if (!subaccountId) redirect(`/subaccount/unauthorized`);
   if (!agencyId) redirect(`/subaccount/unauthorized`);
@@ -41,13 +40,13 @@ const SubAccountIdLayout: React.FC<SubAccountIdLayoutProps> = async ({
   }
 
   const authUser = await getAuthUserDetails();
-  const hasPermission = authUser?.Permissions.find(
+  const hasPermission = authUser?.permissions.find(
     (permission) =>
       permission.access && permission.subAccountId === subaccountId
   );
   if (!hasPermission) redirect(`/subaccount/unauthorized`);
 
-  const allNotifications = await getNotificationAndUser(agencyId);
+  const allNotifications = await getNotification(agencyId);
 
   if (
     user.privateMetadata.role === Role.AGENCY_ADMIN ||
@@ -69,7 +68,7 @@ const SubAccountIdLayout: React.FC<SubAccountIdLayoutProps> = async ({
         <InfoBar
           notifications={notifications}
           role={user.privateMetadata.role as Role}
-          subAccountId={subaccountId as string}
+          subAccountId={params.subaccountId as string}
         />
         <div className="relative">{children}</div>
       </div>

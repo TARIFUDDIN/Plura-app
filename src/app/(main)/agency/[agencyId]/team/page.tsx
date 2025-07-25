@@ -1,22 +1,24 @@
-import React from 'react'
+import React from "react";
 import { redirect } from "next/navigation";
-import DataTable from './data-table'
-import { Plus } from 'lucide-react'
-import { currentUser } from '@clerk/nextjs/server'
-import { columns } from './columns'
-import SendInvitation from '@/components/forms/send-invitation'
-import { getAgencyDetails, getAuthUserGroup } from '@/lib/queries';
+import { currentUser } from "@clerk/nextjs";
+import { Plus } from "lucide-react";
 
-interface Props {
-  params: Promise<{
-    agencyId: string
-  }>
+import { getAgencyDetails } from "@/queries/agency";
+import { getAuthUserGroup } from "@/queries/auth";
+
+import TeamsDataTable from "./data-table";
+import { teamTableColumns } from "./columns";
+import SendInvitation from "@/components/forms/SendInvitation";
+import { constructMetadata } from "@/lib/utils";
+
+interface TeamPageProps {
+  params: {
+    agencyId: string | undefined;
+  };
 }
 
-const TeamPage = async ({ params }: Props) => {
-  // Await params before destructuring
-  const { agencyId } = await params;
-  
+const TeamPage: React.FC<TeamPageProps> = async ({ params }) => {
+  const { agencyId } = params;
   const authUser = await currentUser();
 
   if (!authUser) redirect("/agency/sign-in");
@@ -29,19 +31,24 @@ const TeamPage = async ({ params }: Props) => {
   if (!agencyDetails) redirect("/agency/unauthorized");
 
   return (
-    <DataTable
+    <TeamsDataTable
       actionButtonText={
         <>
-          <Plus size={15} />
+          <Plus className="w-4 h-4" />
           Add
         </>
       }
-      modalChildren={<SendInvitation agencyId={agencyDetails.id} />}
+      modalChildren={<SendInvitation agencyId={agencyId} />}
       filterValue="name"
-      columns={columns}
+      // @ts-expect-error not sure why this error occurs but table is working fine
+      columns={teamTableColumns}
       data={teamMembers}
     />
-  )
-}
+  );
+};
 
-export default TeamPage
+export default TeamPage;
+
+export const metadata = constructMetadata({
+  title: "Team - Plura",
+});

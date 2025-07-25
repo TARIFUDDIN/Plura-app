@@ -10,7 +10,7 @@ import { Button } from "../ui/button";
 interface FileUploadProps {
   endpoint: keyof typeof fileRouter;
   onChange: (url?: string) => void;
-  value: string | undefined;
+  value: string;
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({

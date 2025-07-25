@@ -1,27 +1,34 @@
-import BlurPage from '@/components/common/BlurPage';
-import MediaComponent from '@/components/media';
-import { getMedia } from '@/lib/queries';
-import React from 'react';
+import React from "react";
+import { redirect } from "next/navigation";
 
-type Props = {
-  params: Promise<{ subaccountId: string }>;
-};
+import { getMedia } from "@/queries/media";
 
-const MediaPage = async ({ params }: Props) => {
-  // Await params before using its properties
-  const { subaccountId } = await params;
+import BlurPage from "@/components/common/BlurPage";
+import Media from "@/components/modules/media/Media";
+import { constructMetadata } from "@/lib/utils";
 
-  if (!subaccountId) {
-    throw new Error('subaccountId is missing or undefined.');
-  }
+interface MediaPageProps {
+  params: {
+    subaccountId: string | undefined;
+  };
+}
 
-  const data = await getMedia(subaccountId);
+const MediaPage: React.FC<MediaPageProps> = async ({ params }) => {
+  const { subaccountId } = params;
+
+  if (!subaccountId) redirect(`/subaccount/unauthorized`);
+
+  const media = await getMedia(subaccountId);
 
   return (
     <BlurPage>
-      <MediaComponent data={data} subaccountId={subaccountId} />
+      <Media data={media} subAccountId={subaccountId} />
     </BlurPage>
   );
 };
 
 export default MediaPage;
+
+export const metadata = constructMetadata({
+  title: "Media - Plura",
+});

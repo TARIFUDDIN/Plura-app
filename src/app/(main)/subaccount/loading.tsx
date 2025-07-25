@@ -1,12 +1,12 @@
-import Loading from '@/components/global/loading'
-import React from 'react'
+import React from "react";
+import Loading from "@/components/ui/loading";
 
-const LoadingAgencyPage = () => {
+const SubAccountLoading: React.FC = () => {
   return (
     <div className="h-screen w-screen flex justify-center items-center">
-      <Loading></Loading>
+      <Loading />
     </div>
-  )
-}
+  );
+};
 
-export default LoadingAgencyPage
+export default SubAccountLoading;

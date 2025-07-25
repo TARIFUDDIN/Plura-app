@@ -1,5 +1,16 @@
-'use client'
-import React from 'react'
+'use client';
+
+import React from "react";
+import {
+  type ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { Search } from "lucide-react";
+
+import { useModal } from "@/hooks/use-modal";
 import {
   Table,
   TableBody,
@@ -7,56 +18,48 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import CustomModal from "@/components/common/CustomModal";
 
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
-import { useModal } from '@/components/providers/ModalProvider'
-import { Search } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import CustomModal from '@/components/global/custom-modal'
-
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  filterValue: string
-  actionButtonText?: React.ReactNode
-  modalChildren?: React.ReactNode
+interface TeamsDataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  filterValue: string;
+  actionButtonText?: React.ReactNode;
+  modalChildren?: React.ReactNode;
 }
-export default function DataTable<TData, TValue>({
+
+function TeamsDataTable<TData, TValue>({
   columns,
   data,
   filterValue,
   actionButtonText,
   modalChildren,
-}: DataTableProps<TData, TValue>) {
-  const { setOpen } = useModal()
+}: TeamsDataTableProps<TData, TValue>) {
+  const { setOpen } = useModal();
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-  })
+  });
+
   return (
-    <>
+    <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center py-4 gap-2">
-          <Search />
+        <div className="relative">
+          <Search className="w-4 h-4 absolute left-4 top-4 text-muted-foreground" />
           <Input
-            placeholder="Search Name..."
+            placeholder="Search name..."
             value={
-              (table.getColumn(filterValue)?.getFilterValue() as string) ?? ''
+              (table.getColumn(filterValue)?.getFilterValue() as string) ?? ""
             }
-            onChange={(event) => {
+            onChange={(event) =>
               table.getColumn(filterValue)?.setFilterValue(event.target.value)
-            }}
-            className="h-12"
+            }
+            className="h-12 pl-10"
           />
         </div>
         <Button
@@ -65,35 +68,34 @@ export default function DataTable<TData, TValue>({
             if (modalChildren) {
               setOpen(
                 <CustomModal
-                  title="Add a team member"
-                  subheading="Send an invitation"
+                  title="Add a Team member"
+                  subTitle="Send an invitation"
+                  scrollShadow={false}
                 >
                   {modalChildren}
                 </CustomModal>
-              )
+              );
             }
           }}
         >
           {actionButtonText}
         </Button>
       </div>
-      <div className="border bg-background rounded-lg">
+      <div className="border bg-background rounded-md">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  )
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -102,7 +104,7 @@ export default function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
+                  data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -120,13 +122,15 @@ export default function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No Results.
+                  No results.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-    </>
-  )
+    </div>
+  );
 }
+
+export default TeamsDataTable;

@@ -1,38 +1,46 @@
-import { Button } from '@/components/ui/button'
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { CheckCircle2 } from "lucide-react";
+
+import { getAgencyDetails, updateAgencyConnectedId } from "@/queries/agency";
+
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { db } from '@/lib/db'
-import { getStripeOAuthLink } from '@/lib/utils'
-import { CheckCircleIcon } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
-import React from 'react'
-import { stripe } from '@/lib/stripe'
+} from "@/components/ui/card";
 
-type Props = {
-  params: Promise<{
-    agencyId: string
-  }>
-  searchParams: Promise<{ code?: string }>
+import { constructMetadata, getStripeOAuthLink, logger } from "@/lib/utils";
+import { stripe } from "@/lib/stripe";
+
+interface LaunchPagPageageProps {
+  params: {
+    agencyId: string | undefined;
+  };
+  searchParams: {
+    code: string | undefined;
+  };
 }
 
-const LaunchPadPage = async ({ params, searchParams }: Props) => {
-  // Await both params and searchParams
-  const { agencyId } = await params
-  const { code } = await searchParams
-  
-  const agencyDetails = await db.agency.findUnique({
-    where: { id: agencyId },
-  })
+const LaunchPagPageage: React.FC<LaunchPagPageageProps> = async ({
+  params,
+  searchParams,
+}) => {
+  const { agencyId } = params;
+  const { code } = searchParams;
 
-  if (!agencyDetails) return
+  if (!agencyId) redirect("/agency/unauthorized");
 
-  const allDetailsExist =
+  const agencyDetails = await getAgencyDetails(agencyId);
+
+  if (!agencyDetails) redirect("/agency/unauthorized");
+
+  const isAllDetailsExist =
     agencyDetails.address &&
     agencyDetails.address &&
     agencyDetails.agencyLogo &&
@@ -42,29 +50,30 @@ const LaunchPadPage = async ({ params, searchParams }: Props) => {
     agencyDetails.country &&
     agencyDetails.name &&
     agencyDetails.state &&
-    agencyDetails.zipCode
+    agencyDetails.zipCode;
 
   const stripeOAuthLink = getStripeOAuthLink(
-    'agency',
+    "agency",
     `launchpad___${agencyDetails.id}`
-  )
-
-  let connectedStripeAccount = false
+  );
+  let connectedStripeAccount: boolean = false;
 
   if (code) {
     if (!agencyDetails.connectAccountId) {
       try {
+        // connect stripe account
         const response = await stripe.oauth.token({
-          grant_type: 'authorization_code',
-          code: code,
-        })
-        await db.agency.update({
-          where: { id: agencyId },
-          data: { connectAccountId: response.stripe_user_id },
-        })
-        connectedStripeAccount = true
-      } catch {
-        console.log('🔴 Could not connect stripe account')
+          grant_type: "authorization_code",
+          code,
+        });
+
+        if (response?.stripe_user_id) {
+          await updateAgencyConnectedId(agencyId, response?.stripe_user_id);
+        }
+
+        connectedStripeAccount = true;
+      } catch (error) {
+        logger("Could not connect stripe account", error);
       }
     }
   }
@@ -76,28 +85,28 @@ const LaunchPadPage = async ({ params, searchParams }: Props) => {
           <CardHeader>
             <CardTitle>Lets get started!</CardTitle>
             <CardDescription>
-              Follow the steps below to get your account setup.
+              Follow the steps below to get your account setup
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            <div className="flex justify-between items-center w-full border p-4 rounded-lg gap-2">
-              <div className="flex md:items-center gap-4 flex-col md:!flex-row">
+            <div className="flex justify-between items-center border p-4 rounded-md gap-2">
+              <div className="flex md:items-center gap-4 flex-col md:flex-row">
                 <Image
                   src="/appstore.png"
-                  alt="app logo"
+                  alt="App Logo"
                   height={80}
                   width={80}
                   className="rounded-md object-contain"
                 />
-                <p> Save the website as a shortcut on your mobile device</p>
+                <p>Save the websites as a shortcut on your mobile devices.</p>
               </div>
               <Button>Start</Button>
             </div>
-            <div className="flex justify-between items-center w-full border p-4 rounded-lg gap-2">
-              <div className="flex md:items-center gap-4 flex-col md:!flex-row">
+            <div className="flex justify-between items-center border p-4 rounded-md gap-2">
+              <div className="flex md:items-center gap-4 flex-col md:flex-row">
                 <Image
                   src="/stripelogo.png"
-                  alt="app logo"
+                  alt="App Logo"
                   height={80}
                   width={80}
                   className="rounded-md object-contain"
@@ -108,39 +117,38 @@ const LaunchPadPage = async ({ params, searchParams }: Props) => {
                 </p>
               </div>
               {agencyDetails.connectAccountId || connectedStripeAccount ? (
-                <CheckCircleIcon
-                  size={50}
-                  className=" text-primary p-2 flex-shrink-0"
+                <CheckCircle2
+                  role="status"
+                  aria-label="Done"
+                  className="text-emerald-500 p-2 flex-shrink-0 w-12 h-12"
                 />
               ) : (
-                <Link
-                  className="bg-primary py-2 px-4 rounded-md text-white"
-                  href={stripeOAuthLink}
-                >
+                <Link href={stripeOAuthLink} className={buttonVariants()}>
                   Start
                 </Link>
               )}
             </div>
-            <div className="flex justify-between items-center w-full border p-4 rounded-lg gap-2">
-              <div className="flex md:items-center gap-4 flex-col md:!flex-row">
+            <div className="flex justify-between items-center border p-4 rounded-md gap-2">
+              <div className="flex md:items-center gap-4 flex-col md:flex-row">
                 <Image
                   src={agencyDetails.agencyLogo}
-                  alt="app logo"
+                  alt="App Logo"
                   height={80}
                   width={80}
                   className="rounded-md object-contain"
                 />
-                <p> Fill in all your bussiness details</p>
+                <p>Fill in all your business details</p>
               </div>
-              {allDetailsExist ? (
-                <CheckCircleIcon
-                  size={50}
-                  className="text-primary p-2 flex-shrink-0"
+              {isAllDetailsExist ? (
+                <CheckCircle2
+                  role="status"
+                  aria-label="Done"
+                  className="text-emerald-500 p-2 flex-shrink-0 w-12 h-12"
                 />
               ) : (
                 <Link
-                  className="bg-primary py-2 px-4 rounded-md text-white"
                   href={`/agency/${agencyId}/settings`}
+                  className={buttonVariants()}
                 >
                   Start
                 </Link>
@@ -150,7 +158,11 @@ const LaunchPadPage = async ({ params, searchParams }: Props) => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LaunchPadPage
+export default LaunchPagPageage;
+
+export const metadata = constructMetadata({
+  title: "Launchpad - Plura",
+});

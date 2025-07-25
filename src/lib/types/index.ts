@@ -1,174 +1,86 @@
+import { Stripe } from "stripe";
+import { getAuthUserDetails } from "@/queries/auth";
+import { getSubAccountWithContacts } from "@/queries/contacts";
+import { getMedia } from "@/queries/media";
+import { getUserWithPermissionsAndSubAccount } from "@/queries/permissions";
+import { getPipelineDetails, getPipelines } from "@/queries/pipelines";
+import { getTicketDetails, getTicketsWithTags } from "@/queries/tickets";
+import { getFunnels } from "@/queries/funnels";
+
 import type {
-    Contact,
-    Lane,
-    Notification,
-    Prisma,
-    Tag,
-    Ticket,
-    User,
-    SubAccount,
-    Role,
-  } from "@prisma/client";
-import type { _getTicketsWithAllRelations, getAuthUserDetails, getFunnels, getMedia, getPipelineDetails, getTicketsWithTags, getUserPermissions } from "../queries";
-import { z } from 'zod'
-import Stripe from 'stripe'
+  Contact,
+  Lane,
+  Notification,
+  Prisma,
+  Tag,
+  Ticket,
+  User,
+} from "@prisma/client";
 
 export type NotificationsWithUser =
-  | ({ User: User } & Notification)[]
+  | ({ user: User } & Notification)[]
   | undefined;
 
 export type UserWithPermissionsAndSubAccounts = Prisma.PromiseReturnType<
-  typeof getUserPermissions
->
+  typeof getUserWithPermissionsAndSubAccount
+>;
 
-// ✅ FIXED: Properly define the user type without Promise wrapper
-export type UsersWithAgencySubAccountPermissionsSidebarOptions = {
-  id: string;
-  name: string;
-  avatarUrl: string;
-  email: string;
-  createdAt: Date;
-  updatedAt: Date;
-  role: Role;
-  agencyId: string | null;
-  Agency: {
-    id: string;
-    connectAccountId: string;
-    customerId: string;
-    name: string;
-    agencyLogo: string;
-    companyEmail: string;
-    companyPhone: string;
-    whiteLabel: boolean;
-    address: string;
-    city: string;
-    zipCode: string;
-    state: string;
-    country: string;
-    goal: number;
-    createdAt: Date;
-    updatedAt: Date;
-    SubAccount: SubAccount[];
-  } | null;
-  Permissions: Array<{
-    id: string;
-    email: string;
-    subAccountId: string;
-    access: boolean;
-    SubAccount: SubAccount;
-  }>;
-} | null
+export type AuthUserWithAgencySidebarOptionsAndSubAccounts =
+  Prisma.PromiseReturnType<typeof getAuthUserDetails>;
 
-export type AuthUserWithAgencySigebarOptionsSubAccounts =
-  Prisma.PromiseReturnType<typeof getAuthUserDetails>
+export type UsersWithAgencySubAccountPermissionsSidebarOptions =
+  Prisma.PromiseReturnType<typeof getAuthUserDetails>;
 
-export type CreateMediaType = Prisma.MediaCreateWithoutSubaccountInput
-export type GetMediaFiles = Prisma.PromiseReturnType<typeof getMedia>
+export type MediaFiles = Prisma.PromiseReturnType<typeof getMedia>;
 
-// ✅ FIXED: Updated TicketAndTags to use number instead of Decimal
-export type TicketAndTags = Omit<Ticket, 'value'> & {
-  value: number | null
-  Lane: {
-    id: string
-    name: string
-    createdAt: Date
-    updatedAt: Date
-    order: number
-    pipelineId: string
-  }
-  Tags: Tag[]
-  Assigned: User | null
-  Customer: Contact | null
-}
-// ✅ FIXED: Updated LaneDetail to use the new TicketAndTags type
-export type LaneDetail = Lane & {
-  Tickets: TicketAndTags[]
-}
+export type CreateMediaType = Prisma.MediaCreateWithoutSubAccountInput;
 
-export const CreatePipelineFormSchema = z.object({
-  name: z.string().min(1)
-})
+export type TicketAndTags = Ticket & {
+  tags: Tag[];
+  assigned: User | null;
+  customer: Contact | null;
+};
 
-export const CreateFunnelFormSchema = z.object({
-  name: z.string().min(1),
-  description: z.string(),
-  subDomainName: z.string().optional(),
-  favicon: z.string().optional(),
-})
+export type LaneDetails = Lane & {
+  tickets: TicketAndTags[];
+};
+
+export type TicketDetails = Prisma.PromiseReturnType<typeof getTicketDetails>;
 
 export type PipelineDetailsWithLanesCardsTagsTickets = Prisma.PromiseReturnType<
   typeof getPipelineDetails
->
+>;
 
-export const LaneFormSchema = z.object({
-  name: z.string().min(1),
-})
+export type TicketsWithTags = Prisma.PromiseReturnType<
+  typeof getTicketsWithTags
+>;
 
-// ✅ FIXED: Updated TicketDetails to match the query return type
-export type TicketDetails = Prisma.PromiseReturnType<
-  typeof _getTicketsWithAllRelations
->
+export type SubAccountWithContacts = Prisma.PromiseReturnType<
+  typeof getSubAccountWithContacts
+>;
 
-export const ContactUserFormSchema = z.object({
-  name: z.string().min(1, 'Required'),
-  email: z.string().email(),
-})
-
-// ✅ FIXED: Updated TicketWithTags to match the query return type  
-export type TicketWithTags = Prisma.PromiseReturnType<typeof getTicketsWithTags>
-
-export type Address = {
-  city: string
-  country: string
-  line1: string
-  postal_code: string
-  state: string
-}
+export type ShippingAddress = {
+  city: string;
+  country: string;
+  line1: string;
+  postal_code: string;
+  state: string;
+};
 
 export type ShippingInfo = {
-  address: Address
-  name: string
-}
+  address: ShippingAddress;
+  name: string;
+};
 
-export const currencyNumberRegex = /^\d+(\.\d{1,2})?$/
+export type StripeCustomer = {
+  email: string;
+  name: string;
+  shipping: ShippingInfo;
+  address: ShippingAddress;
+};
 
-export const TicketFormSchema = z.object({
-  name: z.string().min(1),
-  description: z.string().optional(),
-  value: z.string().refine((value) => currencyNumberRegex.test(value), {
-    message: 'Value must be a valid price.',
-  }),
-})
+export type PriceList = Stripe.ApiList<Stripe.Price>;
 
-export type StripeCustomerType = {
-  email: string
-  name: string
-  shipping: ShippingInfo
-  address: Address
-}
+export type FunnelsForSubAccount = Prisma.PromiseReturnType<typeof getFunnels>[0];
 
-export type PricesList = Stripe.ApiList<Stripe.Price>
-
-export type FunnelsForSubAccount = Prisma.PromiseReturnType<
-  typeof getFunnels
->[0]
-
-export type UpsertFunnelPage = Prisma.FunnelPageCreateWithoutFunnelInput
-
-export const FunnelPageSchema = z.object({
-  name: z.string().min(1),
-  pathName: z.string().optional(),
-})
-export type ModalData = {
-  user?: {
-    id: string;
-    role: Role;
-    name: string;
-    avatarUrl: string;
-    email: string;
-    createdAt: Date;
-    updatedAt: Date;
-    agencyId: string | null;
-  };
-  ticket?: TicketWithTags[0]; // This will now include the Lane property
-}
+export type PipelinesWithLanesAndTickets = Prisma.PromiseReturnType<typeof getPipelines>

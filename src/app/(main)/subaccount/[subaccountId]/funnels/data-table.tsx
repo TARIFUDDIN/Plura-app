@@ -1,15 +1,16 @@
-'use client'
-import React from 'react'
+"use client";
 
+import React from "react";
 import {
-  ColumnDef,
+  type ColumnDef,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   useReactTable,
-} from '@tanstack/react-table'
-import { Search } from 'lucide-react'
+} from "@tanstack/react-table";
+import { Search } from "lucide-react";
 
+import { useModal } from "@/hooks/use-modal";
 import {
   Table,
   TableBody,
@@ -17,18 +18,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useModal } from '@/components/providers/ModalProvider'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import CustomModal from '@/components/global/custom-modal'
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import CustomModal from "@/components/common/CustomModal";
 
 interface FunnelsDataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  filterValue: string
-  actionButtonText?: React.ReactNode
-  modalChildren?: React.ReactNode
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  filterValue: string;
+  actionButtonText?: React.ReactNode;
+  modalChildren?: React.ReactNode;
 }
 
 export default function FunnelsDataTable<TData, TValue>({
@@ -38,29 +38,32 @@ export default function FunnelsDataTable<TData, TValue>({
   modalChildren,
   actionButtonText,
 }: FunnelsDataTableProps<TData, TValue>) {
-  const { setOpen } = useModal()
+  const { isOpen, setOpen, setClose } = useModal();
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-  })
+  });
+
   return (
     <>
       <div className="flex items-center justify-between">
         <div className="flex items-center py-4 gap-2">
-          <Search />
-          <Input
-            placeholder="Search funnel name..."
-            value={
-              (table.getColumn(filterValue)?.getFilterValue() as string) ?? ''
-            }
-            onChange={(event) =>
-              table.getColumn(filterValue)?.setFilterValue(event.target.value)
-            }
-            className="h-12"
-          />
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-4 top-4 text-muted-foreground" />
+            <Input
+              placeholder="Search funnel name..."
+              value={
+                (table.getColumn(filterValue)?.getFilterValue() as string) ?? ""
+              }
+              onChange={(event) =>
+                table.getColumn(filterValue)?.setFilterValue(event.target.value)
+              }
+              className="h-12 pl-10"
+            />
+          </div>
         </div>
         <Button
           className="flex- gap-2"
@@ -68,19 +71,19 @@ export default function FunnelsDataTable<TData, TValue>({
             if (modalChildren)
               setOpen(
                 <CustomModal
-                  title="Create A Funnel"
-                  subheading="Funnels are a like websites, but better! Try creating one!"
+                  title="Create a Funnel"
+                  subTitle="Funnels are a like websites, but better! Try creating one!"
                 >
                   {modalChildren}
                 </CustomModal>
-              )
+              );
           }}
         >
           {actionButtonText}
         </Button>
       </div>
-      <div className=" border bg-background rounded-lg">
-        <Table className="">
+      <div className="border bg-background rounded-lg">
+        <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -94,7 +97,7 @@ export default function FunnelsDataTable<TData, TValue>({
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -104,7 +107,7 @@ export default function FunnelsDataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
+                  data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -120,9 +123,9 @@ export default function FunnelsDataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center text-muted-foreground text-sm"
                 >
-                  No Results.
+                  No results found.
                 </TableCell>
               </TableRow>
             )}
@@ -130,5 +133,5 @@ export default function FunnelsDataTable<TData, TValue>({
         </Table>
       </div>
     </>
-  )
+  );
 }

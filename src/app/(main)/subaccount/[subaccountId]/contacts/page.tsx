@@ -1,8 +1,9 @@
 import React from "react";
 import { redirect } from "next/navigation";
+import { Decimal } from "@prisma/client/runtime/library";
 import { format } from "date-fns";
 
-import { getSubAccountWithContacts } from "@/lib/queries";
+import { getSubAccountWithContacts } from "@/queries/contacts";
 
 import BlurPage from "@/components/common/BlurPage";
 import { constructMetadata, formatPrice } from "@/lib/utils";
@@ -16,32 +17,30 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import CreateContactButton from "./_components/create-contact-btn";
+import CreateContactButton from "./_components/CreateButton";
 
 interface SubAccountContactPageProps {
-  params: Promise<{
+  params: {
     subaccountId: string | undefined;
-  }>;
+  };
 }
 
 const SubAccountContactPage: React.FC<SubAccountContactPageProps> = async ({
   params,
 }) => {
-  // Await params before using its properties
-  const { subaccountId } = await params;
+  const { subaccountId } = params;
 
   if (!subaccountId) redirect("/subaccount/unauthorized");
 
   const contacts = await getSubAccountWithContacts(subaccountId);
-  const allContacts = contacts?.Contact;
+  const allContacts = contacts?.contacts;
 
-  // Updated formatTotal to work with number instead of Decimal
-  const formatTotal = (tickets: { value: number | null }[]) => {
+  const formatTotal = (tickets: { value: Decimal | null }[]) => {
     if (!tickets || !tickets.length) return null;
 
     const laneAmt = tickets.reduce(
-      (sum, ticket) => sum + (ticket.value || 0),
-      0,
+      (sum, ticket) => sum + (Number(ticket.value) || 0),
+      0
     );
 
     return formatPrice(laneAmt);
@@ -51,7 +50,7 @@ const SubAccountContactPage: React.FC<SubAccountContactPageProps> = async ({
     <BlurPage>
       <div className="flex items-center justify-between md:flex-row flex-col gap-2">
         <h1 className="text-3xl mb-4 font-bold">Contacts</h1>
-        <CreateContactButton subaccountId={subaccountId} />
+        <CreateContactButton subAccountId={subaccountId} />
       </div>
       <Table>
         <TableHeader>
@@ -78,7 +77,7 @@ const SubAccountContactPage: React.FC<SubAccountContactPageProps> = async ({
                   </TableCell>
                   <TableCell>{contact.email}</TableCell>
                   <TableCell>
-                    {formatTotal(contact.Ticket) === null ? (
+                    {formatTotal(contact.tickets) === null ? (
                       <Badge variant="destructive">Inactive</Badge>
                     ) : (
                       <Badge className="bg-emerald-700">Active</Badge>
@@ -87,7 +86,7 @@ const SubAccountContactPage: React.FC<SubAccountContactPageProps> = async ({
                   <TableCell>
                     {format(contact.createdAt, "MM/dd/yyyy")}
                   </TableCell>
-                  <TableCell>{formatTotal(contact.Ticket)}</TableCell>
+                  <TableCell>{formatTotal(contact.tickets)}</TableCell>
                 </TableRow>
               );
             })}

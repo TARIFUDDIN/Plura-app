@@ -29,7 +29,7 @@ export const upsertSubAccount = async (subAccount: SubAccount) => {
 
   const agencyOwner = await db.user.findFirst({
     where: {
-      Agency: {
+      agency: {
         id: subAccount.agencyId,
       },
       role: Role.AGENCY_OWNER,
@@ -49,7 +49,7 @@ export const upsertSubAccount = async (subAccount: SubAccount) => {
     update: subAccount,
     create: {
       ...subAccount,
-      Permissions: {
+      permissions: {
         create: {
           id: permissionId,
           access: true,
@@ -60,12 +60,12 @@ export const upsertSubAccount = async (subAccount: SubAccount) => {
           id: permissionId,
         },
       },
-      Pipeline: {
+      pipelines: {
         create: {
           name: "Lead Cycle",
         },
       },
-      SidebarOption: {
+      sidebarOptions: {
         create: [
           {
             name: "Launchpad",
@@ -118,15 +118,15 @@ export const upsertSubAccount = async (subAccount: SubAccount) => {
 export const getSubAccountTeamMembers = async (subAccountId: string) => {
   const subAccountWithAccess = await db.user.findMany({
     where: {
-      Agency: {
-        SubAccount: {
+      agency: {
+        subAccounts: {
           some: {
             id: subAccountId,
           },
         },
       },
       role: Role.SUBACCOUNT_USER,
-      Permissions: {
+      permissions: {
         some: {
           subAccountId,
           access: true,
@@ -144,8 +144,7 @@ export const deleteSubAccount = async (subAccountId: string) => {
       id: subAccountId,
     },
   });
-  
-  await db.permissions.deleteMany({
+  const deletePermissions = await db.permissions.deleteMany({
     where: {
       subAccountId,
     },

@@ -1,9 +1,9 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { clerkClient, currentUser } from "@clerk/nextjs/server";
+import { clerkClient, currentUser } from "@clerk/nextjs";
 import { Role, type User } from "@prisma/client";
-
+import { logger } from "@/lib/utils";
 
 export const getAuthUser = async (email: string) => {
   try {
@@ -19,7 +19,7 @@ export const getAuthUser = async (email: string) => {
 
     return details as User;
   } catch (error) {
-    console.log(error);
+    logger(error);
   }
 };
 
@@ -35,19 +35,19 @@ export const getAuthUserDetails = async () => {
       email: user.emailAddresses[0].emailAddress,
     },
     include: {
-      Agency: {
+      agency: {
         include: {
-          SidebarOption: true,
-          SubAccount: {
+          sidebarOptions: true,
+          subAccounts: {
             include: {
-              SidebarOption: true,
+              sidebarOptions: true,
             },
           },
         },
       },
-      Permissions: {
+      permissions: {
         include: {
-          SubAccount: true,
+          subAccount: true,
         },
       },
     },
@@ -59,13 +59,13 @@ export const getAuthUserDetails = async () => {
 export const getAuthUserGroup = async (agencyId: string) => {
   const teamMembers = await db.user.findMany({
     where: {
-      Agency: {
+      agency: {
         id: agencyId,
       },
     },
     include: {
-      Agency: { include: { SubAccount: true } },
-      Permissions: { include: { SubAccount: true } },
+      agency: { include: { subAccounts: true } },
+      permissions: { include: { subAccount: true } },
     },
   });
 
@@ -73,13 +73,12 @@ export const getAuthUserGroup = async (agencyId: string) => {
 };
 
 export const deleteUser = async (userId: string) => {
-    const client=await clerkClient();
-  await client.users.updateUserMetadata(userId, {
+  await clerkClient.users.updateUserMetadata(userId, {
     privateMetadata: {
       role: undefined,
     },
   });
-  await client.users.deleteUser(userId);
+  await clerkClient.users.deleteUser(userId);
   const deletedUser = await db.user.delete({ where: { id: userId } });
 
   return deletedUser;
@@ -118,8 +117,7 @@ export const initUser = async (newUser: Partial<User>) => {
     },
   });
 
-  const client=await clerkClient();
-  await client.users.updateUserMetadata(user.id, {
+  await clerkClient.users.updateUserMetadata(user.id, {
     privateMetadata: {
       role: newUser.role || Role.SUBACCOUNT_USER,
     },
@@ -134,8 +132,7 @@ export const updateUser = async (user: Partial<User>) => {
     data: { ...user },
   });
 
-  const client=await clerkClient();
-  await client.users.updateUserMetadata(response.id, {
+  await clerkClient.users.updateUserMetadata(response.id, {
     privateMetadata: {
       role: user.role || Role.SUBACCOUNT_USER,
     },

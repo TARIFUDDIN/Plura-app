@@ -1,73 +1,70 @@
-// app/api/stripe/create-checkout-session/route.ts - Fixed route handler
 import { db } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
+import { logger } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
+  const {
+    subAccountConnectedId,
+    prices,
+    subAccountId,
+  }: {
+    subAccountConnectedId: string;
+    subAccountId: string;
+    prices: { recurring: boolean; productId: string }[];
+  } = await req.json();
+
+  const origin = req.headers.get("origin");
+
+  if (!subAccountConnectedId || !subAccountId || !prices.length) {
+    return NextResponse.json(
+      {
+        error: "Stripe Account Id or Price Id is missing",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  if (
+    !process.env.NEXT_PUBLIC_PLATFORM_SUBSCRIPTION_PERCENT ||
+    !process.env.NEXT_PUBLIC_PLATFORM_ONETIME_FEE ||
+    !process.env.NEXT_PUBLIC_PLATFORM_AGENCY_PERCENT
+  ) {
+    return NextResponse.json(
+      {
+        error: "Subscription percent, onetime fee or agency percent is missing",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  const subAccountWithAgency = await db.subAccount.findUnique({
+    where: {
+      id: subAccountId,
+    },
+    include: {
+      agency: true,
+    },
+  });
+
+  const subscriptionPriceExists = prices.find((price) => price.recurring);
+
+  if (!subAccountWithAgency?.agency.connectAccountId) {
+    return NextResponse.json(
+      {
+        error: "Stripe Account Id is missing for the selected sub account"
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
   try {
-    const {
-      subAccountConnectedId,
-      prices,
-      subAccountId,
-    }: {
-      subAccountConnectedId: string;
-      subAccountId: string;
-      prices: { recurring: boolean; productId: string }[];
-    } = await req.json();
-
-    const origin = req.headers.get("origin");
-
-    // Validation
-    if (!subAccountConnectedId || !subAccountId || !prices.length) {
-      return NextResponse.json(
-        {
-          error: "Stripe Account Id or Price Id is missing",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    if (
-      !process.env.NEXT_PUBLIC_PLATFORM_SUBSCRIPTION_PERCENT ||
-      !process.env.NEXT_PUBLIC_PLATFORM_ONETIME_FEE ||
-      !process.env.NEXT_PUBLIC_PLATFORM_AGENCY_PERCENT
-    ) {
-      return NextResponse.json(
-        {
-          error: "Environment variables are missing",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const subAccountWithAgency = await db.subAccount.findUnique({
-      where: {
-        id: subAccountId,
-      },
-      include: {
-        Agency: true,
-      },
-    });
-
-    if (!subAccountWithAgency?.Agency.connectAccountId) {
-      console.log('Agency is not connected')
-      return NextResponse.json(
-        {
-          error: "Stripe Account Id is missing for the selected sub account"
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const subscriptionPriceExists = prices.find((price) => price.recurring);
-
-    // Create checkout session
     const session = await stripe.checkout.sessions.create(
       {
         line_items: prices.map((price) => ({
@@ -110,11 +107,11 @@ export async function POST(req: NextRequest) {
         },
       }
     );
-  } catch (error) {
-    console.log("Stripe checkout session error:", error);
+  } catch (error: any) {
+    logger(error);
     return NextResponse.json({
-      message: error instanceof Error ? error.message : "An unknown error occurred"
-    }, { status: 500 });
+        message: error.message
+    }, { status: 400 });
   }
 }
 

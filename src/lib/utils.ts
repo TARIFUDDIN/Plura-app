@@ -1,9 +1,48 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from "clsx";
 import { Metadata } from "next";
+import { twMerge } from "tailwind-merge";
+
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
+
+export const logger = (...args: any[]) => {
+  if (process.env.NODE_ENV === "development") {
+    console.log("%c[DEV]:", "background-color: yellow; color: black", args);
+  }
+};
+
+export function formatPrice(
+  price: number | string,
+  options: {
+    currency?: "USD" | "EUR" | "GBP" | "BDT";
+    maximumFractionDigits?: number;
+    notation?: Intl.NumberFormatOptions["notation"];
+  } = {}
+) {
+  const {
+    currency = "USD",
+    notation = "compact",
+    maximumFractionDigits = 2,
+  } = options;
+
+  const numericPrice = typeof price === "string" ? parseFloat(price) : price;
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+    notation,
+    maximumFractionDigits,
+  }).format(numericPrice);
+}
+
+// WIP: Change client ID for production
+export const getStripeOAuthLink = (
+  accountType: "agency" | "subaccount",
+  state: string
+) => {
+  return `https://connect.stripe.com/oauth/v2/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_STRIPE_CLIENT_ID}&scope=read_write&redirect_uri=${process.env.NEXT_PUBLIC_URL}${accountType}&state=${state}`;
+};
 
 export function constructMetadata({
   title = "Plura - run your agency",
@@ -38,7 +77,9 @@ export function constructMetadata({
       creator: "@denvudd",
     },
     icons,
-    metadataBase: new URL("https://digital-hippo-production-denvudd.up.railway.app"),
+    metadataBase: new URL(
+      "https://digital-hippo-production-denvudd.up.railway.app"
+    ),
     ...(noIndex && {
       robots: {
         index: false,
@@ -47,39 +88,3 @@ export function constructMetadata({
     }),
   };
 }
-
-export function formatPrice(
-  price: number | string,
-  options: {
-    currency?: "USD" | "EUR" | "GBP" | "INR";
-    maximumFractionDigits?: number;
-    notation?: Intl.NumberFormatOptions["notation"];
-  } = {}
-) {
-  const {
-    currency = "USD",
-    notation = "compact",
-    maximumFractionDigits = 2,
-  } = options;
-
-  const numericPrice = typeof price === "string" ? parseFloat(price) : price;
-
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    notation,
-    maximumFractionDigits,
-  }).format(numericPrice);
-}export function getStripeOAuthLink(
-  accountType: 'agency' | 'subaccount',
-  state: string
-) {
-  const baseUrl = process.env.NEXT_PUBLIC_URL; // No trailing slash
-  const redirectUri = `${baseUrl}/${accountType}`;
-  const stripeOAuthLink = `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_STRIPE_CLIENT_ID}&scope=read_write&redirect_uri=${redirectUri}&state=${state}`;
-  
-  console.log('Generated Stripe OAuth Link:', stripeOAuthLink);
-  
-  return stripeOAuthLink;
-}
- 
