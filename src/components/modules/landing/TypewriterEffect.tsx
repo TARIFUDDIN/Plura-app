@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,8 @@ export const TypewriterEffect: React.FC<TypewriterEffectProps> = ({
   className,
   cursorClassName,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const words = [
     {
       text: "Run",
@@ -46,6 +48,14 @@ export const TypewriterEffect: React.FC<TypewriterEffectProps> = ({
     };
   });
 
+  // Safety check for DOM element
+  useEffect(() => {
+    if (containerRef.current && typeof window !== 'undefined') {
+      // Element is properly mounted and we're in browser
+      console.log('TypewriterEffect mounted successfully');
+    }
+  }, []);
+
   const renderWords = () => {
     return (
       <span>
@@ -67,7 +77,10 @@ export const TypewriterEffect: React.FC<TypewriterEffectProps> = ({
   };
 
   return (
-    <div className={cn("flex justify-center w-full space-x-1", className)}>
+    <div 
+      ref={containerRef}
+      className={cn("flex justify-center w-full space-x-1", className)}
+    >
       <motion.div
         className="overflow-hidden pb-2"
         initial={{
@@ -81,6 +94,8 @@ export const TypewriterEffect: React.FC<TypewriterEffectProps> = ({
           ease: "linear",
           delay: 1,
         }}
+        // Add viewport options for better compatibility
+        viewport={{ once: true, margin: "-100px" }}
       >
         <div
           className="text-base text-center font-medium"

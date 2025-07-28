@@ -7,7 +7,7 @@ import { TypewriterEffect } from "./TypewriterEffect";
 interface HeroContainerScrollProps {}
 
 export const HeroContainerScroll: React.FC<HeroContainerScrollProps> = ({}) => {
-  const containerRef = React.useRef<any>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
   });
@@ -76,9 +76,10 @@ export const HeroContainerScroll: React.FC<HeroContainerScrollProps> = ({}) => {
             </div>
             <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-primary/0 via-primary/90 to-primary/0 transition-opacity duration-500 group-hover:opacity-40"></span>
           </a>
-          <p className="text-center font-medium mt-4 z-[99999]">
+          {/* ✅ FIXED: Changed <p> to <div> to avoid DOM nesting error */}
+          <div className="text-center font-medium mt-4 z-[99999]">
             <TypewriterEffect />
-          </p>
+          </div>
           <div className="bg-gradient-to-r from-primary to-secondary-foreground text-transparent bg-clip-text relative">
             <h1 className="text-9xl font-bold text-center md:text-[300px] z-[99999]">
               Plura

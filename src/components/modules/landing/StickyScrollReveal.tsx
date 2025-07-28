@@ -141,7 +141,7 @@ export const StickyScroll = ({
   contentClassName?: string | React.ReactNode;
 }) => {
   const [activeCard, setActiveCard] = React.useState(0);
-  const ref = useRef<any>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     // uncomment line 22 and comment line 23 if you DONT want the overflow container and want to have it change on the entire page scroll
     target: ref,
@@ -185,7 +185,8 @@ export const StickyScroll = ({
               >
                 {item.title}
               </motion.h2>
-              <motion.p
+              {/* ✅ FIXED: Changed motion.p to motion.div to avoid nested p tags */}
+              <motion.div
                 initial={{
                   opacity: 0,
                 }}
@@ -195,7 +196,7 @@ export const StickyScroll = ({
                 className="max-w-md mt-4 space-y-2"
               >
                 {item.description}
-              </motion.p>
+              </motion.div>
             </div>
           ))}
           <div className="h-40" />
