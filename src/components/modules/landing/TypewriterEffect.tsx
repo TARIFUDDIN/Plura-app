@@ -37,29 +37,32 @@ export const TypewriterEffect: React.FC<TypewriterEffectProps> = ({
       className: "text-blue-500 dark:text-blue-500",
     },
   ];
-  // split text inside of words into array of characters
+
+  // Split each word's text into array of characters
   const wordsArray = words.map((word) => {
     return {
       ...word,
       text: word.text.split(""),
     };
   });
+
   const renderWords = () => {
     return (
-      <p>
-        {wordsArray.map((word, idx) => {
-          return (
-            <span key={`word-${idx}`} className="inline-block">
-              {word.text.map((char, index) => (
-                <span key={`char-${index}`} className={cn(`z-[99999]`, word.className)}>
-                  {char}
-                </span>
-              ))}
-              &nbsp;
-            </span>
-          );
-        })}
-      </p>
+      <span>
+        {wordsArray.map((word, idx) => (
+          <span key={`word-${idx}`} className="inline-block">
+            {word.text.map((char, index) => (
+              <span
+                key={`char-${index}`}
+                className={cn("z-[99999]", word.className)}
+              >
+                {char}
+              </span>
+            ))}
+            &nbsp;
+          </span>
+        ))}
+      </span>
     );
   };
 
@@ -85,8 +88,8 @@ export const TypewriterEffect: React.FC<TypewriterEffectProps> = ({
             whiteSpace: "nowrap",
           }}
         >
-          {renderWords()}{" "}
-        </div>{" "}
+          {renderWords()}
+        </div>
       </motion.div>
       <motion.span
         initial={{
@@ -97,12 +100,11 @@ export const TypewriterEffect: React.FC<TypewriterEffectProps> = ({
         }}
         transition={{
           duration: 0.8,
-
           repeat: Infinity,
           repeatType: "reverse",
         }}
         className={cn(
-          "block rounded-sm w-[2.5px]  h-6 bg-primary",
+          "block rounded-sm w-[2.5px] h-6 bg-primary",
           cursorClassName
         )}
       ></motion.span>
