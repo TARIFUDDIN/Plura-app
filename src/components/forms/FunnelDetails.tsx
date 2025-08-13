@@ -57,16 +57,20 @@ const FunnelDetails: React.FC<FunnelDetailsProps> = ({
     },
   });
 
+  // Fix: Use useRef to track if we've already reset the form
+  const hasResetRef = React.useRef(false);
+
   React.useEffect(() => {
-    if (defaultData) {
+    if (defaultData && !hasResetRef.current) {
       form.reset({
         description: defaultData.description || "",
         favicon: defaultData.favicon || "",
         name: defaultData.name || "",
         subDomainName: defaultData.subDomainName || "",
       });
+      hasResetRef.current = true;
     }
-  }, [defaultData]);
+  }, [defaultData, form]);
 
   const onSubmit = async (values: FunnelDetailsSchema) => {
     if (!subAccountId) return;

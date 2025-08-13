@@ -47,7 +47,6 @@ import {
   FunnelPageDetailsValidator,
 } from "@/lib/validators/funnel-page-details";
 
-
 interface FunnelPageDetailsProps {
   defaultData?: FunnelPage;
   funnelId: string;
@@ -68,16 +67,23 @@ const FunnelPageDetails: React.FC<FunnelPageDetailsProps> = ({
     resolver: zodResolver(FunnelPageDetailsValidator),
     mode: "onChange",
     defaultValues: {
-      name: "",
-      pathName: "",
+      name: defaultData?.name || "",
+      pathName: defaultData?.pathName || "",
     },
   });
 
+  // Fix: Use useRef to track if we've already reset the form
+  const hasResetRef = React.useRef(false);
+
   React.useEffect(() => {
-    if (defaultData) {
-      form.reset({ name: defaultData.name, pathName: defaultData.pathName });
+    if (defaultData && !hasResetRef.current) {
+      form.reset({ 
+        name: defaultData.name, 
+        pathName: defaultData.pathName 
+      });
+      hasResetRef.current = true;
     }
-  }, [defaultData]);
+  }, [defaultData, form]);
 
   const onSubmit: SubmitHandler<FunnelPageDetailsSchema> = async (values) => {
     if (order !== 0 && !values.pathName)

@@ -117,7 +117,7 @@ const AgencyIdPage: React.FC<AgencyIdPageProps> = async ({ params }) => {
           .toFixed(2);
 
         // Calculate closing rate with division by zero check
-        closingRate = checkoutSessions.data.length > 0 
+        closingRate = checkoutSessions.data.length > 0
           ? +((totalClosedSessions.length / checkoutSessions.data.length) * 100).toFixed(2)
           : 0;
 
@@ -152,7 +152,7 @@ const AgencyIdPage: React.FC<AgencyIdPageProps> = async ({ params }) => {
 
           <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
           <Separator className="mt-2 mb-6" />
-          
+
           <div className="flex flex-col gap-4 pb-6">
             <div className="flex gap-4 flex-col xl:!flex-row">
               {/* Income Card */}
@@ -203,15 +203,12 @@ const AgencyIdPage: React.FC<AgencyIdPageProps> = async ({ params }) => {
                 <Contact2 className="absolute right-4 top-4 text-muted-foreground" />
               </Card>
 
-              {/* Agency Goal Card */}
+              {/* Agency Goal Card - FIX APPLIED HERE */}
               <Card className="flex-1 relative">
                 <CardHeader>
                   <CardTitle>Agency Goal</CardTitle>
-                  <CardDescription>
-                    <p className="mt-2">
-                      Reflects the number of sub accounts you want to own and
-                      manage.
-                    </p>
+                  <CardDescription className="mt-2">
+                    Reflects the number of sub accounts you want to own and manage.
                   </CardDescription>
                 </CardHeader>
                 <CardFooter>
@@ -226,8 +223,8 @@ const AgencyIdPage: React.FC<AgencyIdPageProps> = async ({ params }) => {
                     </div>
                     <Progress
                       value={
-                        agencyDetails.goal > 0 
-                          ? ((subAccounts?.length || 0) / agencyDetails.goal) * 100 
+                        agencyDetails.goal > 0
+                          ? ((subAccounts?.length || 0) / agencyDetails.goal) * 100
                           : 0
                       }
                     />
@@ -243,18 +240,20 @@ const AgencyIdPage: React.FC<AgencyIdPageProps> = async ({ params }) => {
                 <CardHeader>
                   <CardTitle>Transaction History</CardTitle>
                 </CardHeader>
-                <AreaChart
-                  className="text-sm stroke-primary"
-                  data={[
-                    ...(totalClosedSessions || []),
-                    ...(totalPendingSessions || []),
-                  ]}
-                  index="created"
-                  categories={["amount_total"]}
-                  colors={["primary"]}
-                  yAxisWidth={30}
-                  showAnimation={true}
-                />
+                <CardContent>
+                  <AreaChart
+                    className="text-sm stroke-primary"
+                    data={[
+                      ...(totalClosedSessions || []),
+                      ...(totalPendingSessions || []),
+                    ]}
+                    index="created"
+                    categories={["amount_total"]}
+                    colors={["primary"]}
+                    yAxisWidth={30}
+                    showAnimation={true}
+                  />
+                </CardContent>
               </Card>
 
               {/* Conversions Card */}

@@ -50,7 +50,8 @@ export const ModalProvider: React.FC<React.PropsWithChildren> = ({
     if (modal) {
       if (fetch) {
         const newData = await fetch();
-        setData({ ...data, ...newData } || {});
+        // Fix: Remove the always truthy expression
+        setData(newData ? { ...data, ...newData } : data);
       }
 
       setCurrentModal(modal);

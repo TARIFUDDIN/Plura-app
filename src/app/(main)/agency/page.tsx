@@ -72,5 +72,5 @@ const AgencyPage: React.FC<AgencyPageProps> = async ({ searchParams }) => {
 export default AgencyPage;
 
 export const metadata = constructMetadata({
-  title: "Agency - Plura",
+  title: "Agency - Wibex",
 });

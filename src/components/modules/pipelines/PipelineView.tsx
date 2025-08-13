@@ -38,16 +38,19 @@ const PipelineView: React.FC<PipelineViewProps> = ({
   const router = useRouter();
   const { setOpen } = useModal();
 
-  const [allLanes, setAllLanes] = React.useState<LaneDetailsType[]>(lanes);
+  const [allLanes, setAllLanes] = React.useState<LaneDetailsType[]>([]);
   const [allTickets, setAllTickets] = React.useState<TicketAndTags[]>([]);
 
+  // Fix: Use useEffect to set initial state and derived state
   React.useEffect(() => {
     setAllLanes(lanes);
+    
+    // Extract all tickets from lanes
+    const ticketsFromAllLanes: TicketAndTags[] = lanes.flatMap(
+      (lane) => lane.tickets,
+    );
+    setAllTickets(ticketsFromAllLanes);
   }, [lanes]);
-
-  const ticketsFromAllLanes: TicketAndTags[] = lanes.flatMap(
-    (lane) => lane.tickets,
-  );
 
   const handleAddLane = () => {
     setOpen(
@@ -86,8 +89,8 @@ const PipelineView: React.FC<PipelineViewProps> = ({
 
         setAllLanes(newLanes);
         updateLanesOrder(newLanes);
-
         router.refresh();
+        break; // Add break statement
       }
       case "ticket": {
         const lanesCopyArray = [...allLanes];
@@ -111,10 +114,9 @@ const PipelineView: React.FC<PipelineViewProps> = ({
               order: index,
             }));
 
-          originLane.tickets = newTickets; // updates the tickets in the origin lane loccaly
+          originLane.tickets = newTickets; // updates the tickets in the origin lane locally
           setAllLanes(lanesCopyArray);
           updateTicketsOrder(newTickets);
-
           router.refresh();
         } else {
           const [currentTicket] = originLane.tickets.splice(source.index, 1);
@@ -139,9 +141,9 @@ const PipelineView: React.FC<PipelineViewProps> = ({
             ...destinationLane.tickets,
             ...originLane.tickets,
           ]);
-
           router.refresh();
         }
+        break; // Add break statement
       }
     }
   };

@@ -49,8 +49,8 @@ const SubAccountPageId: React.FC<SubAccountPageIdProps> = async ({
 
   let currency: string = "USD";
   let sessions: Stripe.Checkout.Session[] = [];
-  let totalClosedSessions;
-  let totalPendingSessions;
+  let totalClosedSessions: Stripe.Checkout.Session[] = [];
+  let totalPendingSessions: Stripe.Checkout.Session[] = [];
   let net: number = 0;
   let potentialIncome: number = 0;
   let closingRate: number = 0;
@@ -64,56 +64,62 @@ const SubAccountPageId: React.FC<SubAccountPageIdProps> = async ({
   if (!subAccountDetails) redirect("/subaccount/unauthorized");
 
   if (subAccountDetails.connectAccountId) {
-    const response = await stripe.accounts.retrieve({
-      stripeAccount: subAccountDetails.connectAccountId,
-    });
-
-    currency = response.default_currency?.toUpperCase() || "USD";
-
-    const checkoutSessions = await stripe.checkout.sessions.list(
-      {
-        created: {
-          gte: startDate,
-          lte: endDate,
-        },
-        limit: 100,
-      },
-      {
+    try {
+      const response = await stripe.accounts.retrieve({
         stripeAccount: subAccountDetails.connectAccountId,
-      }
-    );
+      });
 
-    sessions = checkoutSessions.data;
+      currency = response.default_currency?.toUpperCase() || "USD";
 
-    totalClosedSessions = checkoutSessions.data
-      .filter((session) => session.status === "complete")
-      .map((session) => ({
-        ...session,
-        created: new Date().toLocaleDateString(),
-        amount_total: session.amount_total ? session.amount_total / 100 : 0,
-      }));
+      const checkoutSessions = await stripe.checkout.sessions.list(
+        {
+          created: {
+            gte: startDate,
+            lte: endDate,
+          },
+          limit: 100,
+        },
+        {
+          stripeAccount: subAccountDetails.connectAccountId,
+        }
+      );
 
-    totalPendingSessions = checkoutSessions.data
-      .filter((session) => session.status === "open")
-      .map((session) => ({
-        ...session,
-        created: new Date().toLocaleDateString(),
-        amount_total: session.amount_total ? session.amount_total / 100 : 0,
-      }));
+      sessions = checkoutSessions.data;
 
-    net = +totalClosedSessions
-      .reduce((total, session) => total + (session.amount_total || 0), 0)
-      .toFixed(2);
+      totalClosedSessions = checkoutSessions.data
+        .filter((session) => session.status === "complete")
+        .map((session) => ({
+          ...session,
+          // Revert: Keep 'created' as number here. Format it only in JSX.
+          // created: new Date(Number(session.created) * 1000).toLocaleDateString(), // <-- REMOVE THIS LINE
+          amount_total: session.amount_total ? session.amount_total / 100 : 0,
+        }));
 
-    potentialIncome = +totalPendingSessions
-      .reduce((total, session) => total + (session.amount_total || 0), 0)
-      .toFixed(2);
+      totalPendingSessions = checkoutSessions.data
+        .filter((session) => session.status === "open")
+        .map((session) => ({
+          ...session,
+          // Revert: Keep 'created' as number here. Format it only in JSX.
+          // created: new Date(Number(session.created) * 1000).toLocaleDateString(), // <-- REMOVE THIS LINE
+          amount_total: session.amount_total ? session.amount_total / 100 : 0,
+        }));
 
-    closingRate +
-      (
-        (totalClosedSessions.length / checkoutSessions.data.length) *
-        100
-      ).toFixed(2);
+      net = +totalClosedSessions
+        .reduce((total, session) => total + (session.amount_total || 0), 0)
+        .toFixed(2);
+
+      potentialIncome = +totalPendingSessions
+        .reduce((total, session) => total + (session.amount_total || 0), 0)
+        .toFixed(2);
+
+      closingRate = sessions.length > 0
+        ? +((totalClosedSessions.length / sessions.length) * 100).toFixed(2)
+        : 0;
+
+    } catch (stripeError) {
+      console.error("Stripe API error in subaccount page:", stripeError);
+      // Keep default values on Stripe error
+    }
   }
 
   const funnels = await getFunnels(subaccountId);
@@ -191,23 +197,23 @@ const SubAccountPageId: React.FC<SubAccountPageIdProps> = async ({
                   value={closingRate}
                   description={
                     <>
-                      {sessions && (
-                        <div className="flex flex-col">
+                      {sessions && sessions.length > 0 && (
+                        <span className="flex flex-col">
                           Total Carts Opened
-                          <div className="flex gap-2">
+                          <span className="flex gap-2">
                             <ShoppingCart className="text-rose-700" />
                             {sessions.length}
-                          </div>
-                        </div>
+                          </span>
+                        </span>
                       )}
-                      {totalClosedSessions && (
-                        <div className="flex flex-col">
+                      {totalClosedSessions && totalClosedSessions.length > 0 && (
+                        <span className="flex flex-col">
                           Won Carts
-                          <div className="flex gap-2">
+                          <span className="flex gap-2">
                             <ShoppingCart className="text-emerald-700" />
                             {totalClosedSessions.length}
-                          </div>
-                        </div>
+                          </span>
+                        </span>
                       )}
                     </>
                   }
@@ -221,12 +227,12 @@ const SubAccountPageId: React.FC<SubAccountPageIdProps> = async ({
               <CardHeader>
                 <CardDescription>Funnel Performance</CardDescription>
               </CardHeader>
-              <CardContent className=" text-sm text-muted-foreground flex flex-col gap-12 justify-between ">
+              <CardContent className="text-sm text-muted-foreground flex flex-col gap-12 justify-between ">
                 <FunnelSubAccountChart data={funnelPerformanceMetrics} />
-                <div className="lg:w-[150px]">
+                <p className="lg:w-[150px]">
                   Total page visits across all funnels. Hover over to get more
                   details on funnel page performance.
-                </div>
+                </p>
               </CardContent>
               <Contact2 className="absolute right-4 top-4 text-muted-foreground" />
             </Card>
@@ -234,15 +240,17 @@ const SubAccountPageId: React.FC<SubAccountPageIdProps> = async ({
               <CardHeader>
                 <CardTitle>Checkout Activity</CardTitle>
               </CardHeader>
-              <AreaChart
-                className="text-sm stroke-primary"
-                data={sessions || []}
-                index="created"
-                categories={["amount_total"]}
-                colors={["primary"]}
-                yAxisWidth={30}
-                showAnimation={true}
-              />
+              <CardContent>
+                <AreaChart
+                  className="text-sm stroke-primary"
+                  data={sessions || []}
+                  index="created"
+                  categories={["amount_total"]}
+                  colors={["primary"]}
+                  yAxisWidth={30}
+                  showAnimation={true}
+                />
+              </CardContent>
             </Card>
           </div>
           <div className="flex gap-4 xl:!flex-row flex-col">
@@ -262,40 +270,35 @@ const SubAccountPageId: React.FC<SubAccountPageIdProps> = async ({
                 <Table>
                   <TableHeader className="!sticky !top-0">
                     <TableRow>
-                      <TableHead className="w-[300px]">Email</TableHead>
-                      <TableHead className="w-[200px]">Status</TableHead>
-                      <TableHead>Created Date</TableHead>
-                      <TableHead className="text-right">Value</TableHead>
+                      <TableHead className="w-[300px]">Email</TableHead><TableHead className="w-[200px]">Status</TableHead><TableHead>Created Date</TableHead><TableHead className="text-right">Value</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody className="font-medium truncate">
-                    {totalClosedSessions
-                      ? totalClosedSessions.map((session) => (
-                          <TableRow key={session.id}>
-                            <TableCell>
-                              {session.customer_details?.email || "-"}
-                            </TableCell>
-                            <TableCell>
-                              <Badge className="bg-emerald-500 dark:text-black">
-                                Paid
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              {format(
-                                new Date(session.created),
-                                "dd/MM/yyyy hh:mm"
-                              )}
-                            </TableCell>
-
-                            <TableCell className="text-right">
-                              <small>{currency}</small>{" "}
-                              <span className="text-emerald-500">
-                                {session.amount_total}
-                              </span>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      : "No Data"}
+                    {totalClosedSessions && totalClosedSessions.length > 0 ? (
+                      totalClosedSessions.map((session) => (
+                        <TableRow key={session.id}>
+                          <TableCell>{session.customer_details?.email || "-"}</TableCell><TableCell>
+                            <Badge className="bg-emerald-500 dark:text-black">
+                              Paid
+                            </Badge>
+                          </TableCell><TableCell>
+                            {format(
+                              new Date(Number(session.created) * 1000), // Only format here
+                              "dd/MM/yyyy hh:mm"
+                            )}
+                          </TableCell><TableCell className="text-right">
+                            <small>{currency}</small>{" "}
+                            <span className="text-emerald-500">
+                              {session.amount_total}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center text-muted-foreground">No Data</TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </CardHeader>

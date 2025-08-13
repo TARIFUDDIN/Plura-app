@@ -75,5 +75,5 @@ const FunnelIdPage: React.FC<FunnelIdPageProps> = async ({ params }) => {
 export default FunnelIdPage;
 
 export const metadata = constructMetadata({
-  title: "Funnel - Plura",
+  title: "Funnel - Wibex",
 });

@@ -32,6 +32,16 @@ const nextConfig = {
     ],
   },
   reactStrictMode: false,
+  webpack: (config) => {
+    // Suppress defaultProps warnings from react-beautiful-dnd
+    config.ignoreWarnings = [
+      {
+        module: /react-beautiful-dnd/,
+        message: /defaultProps/,
+      },
+    ];
+    return config;
+  },
 };
 
 module.exports = nextConfig;
